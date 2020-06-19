@@ -5,7 +5,6 @@ import (
 	"github.com/mackerelio/go-osstat/disk"
 	"github.com/mackerelio/go-osstat/memory"
 	"github.com/mackerelio/go-osstat/network"
-	common_signature "github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
 	common_entity "github.com/oasisprotocol/oasis-core/go/common/entity"
 	common_node "github.com/oasisprotocol/oasis-core/go/common/node"
 	common_quantity "github.com/oasisprotocol/oasis-core/go/common/quantity"
