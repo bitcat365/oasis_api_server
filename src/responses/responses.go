@@ -192,5 +192,10 @@ type ConnectionsResponse struct {
 	Results []string `json:"result"`
 }
 
+// Bech32 Address from public key
+type Bech32Address struct {
+	Bech32Address *staking_api.Address `json:"result"`
+}
+
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.
 var SuccessResponsed = SuccessResponse{Result: "pong"}

@@ -3,6 +3,8 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	//"github.com/oasisprotocol/oasis-core/go/common/crypto/address"
+	staking "github.com/oasisprotocol/oasis-core/go/staking/api"
 	"net/http"
 
 	"google.golang.org/grpc"
@@ -12,6 +14,7 @@ import (
 	"github.com/SimplyVC/oasis_api_server/src/rpc"
 	"github.com/oasisprotocol/oasis-core/go/common/cbor"
 	"github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
+	common_signature "github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
 	consensus "github.com/oasisprotocol/oasis-core/go/consensus/api"
 	mint_api "github.com/oasisprotocol/oasis-core/go/consensus/tendermint/api"
 	"github.com/oasisprotocol/oasis-core/go/consensus/tendermint/crypto"
@@ -518,4 +521,38 @@ func GetTransactions(w http.ResponseWriter, r *http.Request) {
 		"with all transactions in specified Block!")
 	json.NewEncoder(w).Encode(responses.TransactionsResponse{
 		Transactions: transactions})
+}
+
+func PublicKeyToBech32Address(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving consensus public key from the query
+	consensusKey := r.URL.Query().Get("consensus_public_key")
+	if consensusKey == "" {
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "No Consensus Key Provided"})
+		return
+	}
+	var pubKey common_signature.PublicKey
+
+	err := pubKey.UnmarshalText([]byte(consensusKey))
+	if err != nil {
+		lgr.Error.Println("Request at /api/consensus/pubkeybech32address "+
+			"failed to Unmarshal Consensus PublicKey : ", err)
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to Unmarshal Public Key!"})
+		return
+	}
+
+	//var AddressV0Context = address.NewContext("oasis-core/address: staking", 0)
+	cryptoAddress := staking.NewAddress(pubKey)
+
+	// Responds with transactions retrieved above
+	lgr.Info.Println("Request at /api/consensus/pubkeybech32address responding " +
+		"with Tendermint Public Key Address!")
+	json.NewEncoder(w).Encode(responses.Bech32Address{
+		Bech32Address: &cryptoAddress})
 }

@@ -61,6 +61,8 @@ func StartServer() error {
 		handler.GetBlockLastCommit).Methods("Get")
 	router.HandleFunc("/api/consensus/pubkeyaddress",
 		handler.PublicKeyToAddress).Methods("Get")
+	router.HandleFunc("/api/consensus/pubkeybech32address",
+		handler.PublicKeyToBech32Address).Methods("Get")
 	router.HandleFunc("/api/consensus/transactions",
 		handler.GetTransactions).Methods("Get")
 	router.HandleFunc("/api/pingnode",
