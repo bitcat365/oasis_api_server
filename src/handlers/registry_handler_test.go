@@ -9,9 +9,9 @@ import (
 
 	hdl "github.com/SimplyVC/oasis_api_server/src/handlers"
 	"github.com/SimplyVC/oasis_api_server/src/responses"
-	common_entity "github.com/oasislabs/oasis-core/go/common/entity"
-	common_node "github.com/oasislabs/oasis-core/go/common/node"
-	registry_api "github.com/oasislabs/oasis-core/go/registry/api"
+	common_entity "github.com/oasisprotocol/oasis-core/go/common/entity"
+	common_node "github.com/oasisprotocol/oasis-core/go/common/node"
+	registry_api "github.com/oasisprotocol/oasis-core/go/registry/api"
 )
 
 func Test_GetEntities_BadNode(t *testing.T) {

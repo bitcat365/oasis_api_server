@@ -9,9 +9,9 @@ import (
 
 	hdl "github.com/SimplyVC/oasis_api_server/src/handlers"
 	"github.com/SimplyVC/oasis_api_server/src/responses"
-	common_signature "github.com/oasislabs/oasis-core/go/common/crypto/signature"
-	common_quantity "github.com/oasislabs/oasis-core/go/common/quantity"
-	staking_api "github.com/oasislabs/oasis-core/go/staking/api"
+	common_signature "github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
+	common_quantity "github.com/oasisprotocol/oasis-core/go/common/quantity"
+	staking_api "github.com/oasisprotocol/oasis-core/go/staking/api"
 )
 
 func Test_GetTotalSupply_BadNode(t *testing.T) {

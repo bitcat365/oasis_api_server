@@ -9,7 +9,7 @@ import (
 
 	hdl "github.com/SimplyVC/oasis_api_server/src/handlers"
 	"github.com/SimplyVC/oasis_api_server/src/responses"
-	scheduler_api "github.com/oasislabs/oasis-core/go/scheduler/api"
+	scheduler_api "github.com/oasisprotocol/oasis-core/go/scheduler/api"
 )
 
 func Test_GetValidators_BadNode(t *testing.T) {

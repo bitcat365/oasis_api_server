@@ -10,9 +10,9 @@ import (
 	lgr "github.com/SimplyVC/oasis_api_server/src/logger"
 	"github.com/SimplyVC/oasis_api_server/src/responses"
 	"github.com/SimplyVC/oasis_api_server/src/rpc"
-	common_namespace "github.com/oasislabs/oasis-core/go/common"
-	common_signature "github.com/oasislabs/oasis-core/go/common/crypto/signature"
-	registry "github.com/oasislabs/oasis-core/go/registry/api"
+	common_namespace "github.com/oasisprotocol/oasis-core/go/common"
+	common_signature "github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
+	registry "github.com/oasisprotocol/oasis-core/go/registry/api"
 )
 
 // loadRegistryClient loads registry client and returns it

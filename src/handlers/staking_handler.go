@@ -10,8 +10,8 @@ import (
 	lgr "github.com/SimplyVC/oasis_api_server/src/logger"
 	"github.com/SimplyVC/oasis_api_server/src/responses"
 	"github.com/SimplyVC/oasis_api_server/src/rpc"
-	common_signature "github.com/oasislabs/oasis-core/go/common/crypto/signature"
-	staking "github.com/oasislabs/oasis-core/go/staking/api"
+	//common_signature "github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
+	staking "github.com/oasisprotocol/oasis-core/go/staking/api"
 )
 
 // loadStakingClient loads staking client and returns it
@@ -323,7 +323,7 @@ func GetAccounts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return accounts from staking client
-	accounts, err := so.Accounts(context.Background(), height)
+	accounts, err := so.Addresses(context.Background(), height)
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to get Accounts!"})
@@ -370,7 +370,7 @@ func GetAccountInfo(w http.ResponseWriter, r *http.Request) {
 	// Note Make sure that public key that is being sent is coded properly
 	// Example A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU+h+blS9pto= should be
 	// A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU%2Bh%2BblS9pto=
-	var pubKey common_signature.PublicKey
+	//var pubKey common_signature.PublicKey
 	ownerKey := r.URL.Query().Get("ownerKey")
 	if len(ownerKey) == 0 {
 
@@ -384,11 +384,20 @@ func GetAccountInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Unmarshall text into public key object
-	err := pubKey.UnmarshalText([]byte(ownerKey))
+	//err := pubKey.UnmarshalText([]byte(ownerKey))
+	//if err != nil {
+	//	lgr.Error.Println("Failed to UnmarshalText into Public Key", err)
+	//	json.NewEncoder(w).Encode(responses.ErrorResponse{
+	//		Error: "Failed to UnmarshalText into Public Key."})
+	//	return
+	//}
+
+	var address staking.Address
+	err := address.UnmarshalBinary([]byte(ownerKey))
 	if err != nil {
-		lgr.Error.Println("Failed to UnmarshalText into Public Key", err)
+		lgr.Error.Println("Failed to UnmarshalBinary into Address", err)
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to UnmarshalText into Public Key."})
+			Error: "Failed to UnmarshalBinary into Address."})
 		return
 	}
 
@@ -408,10 +417,11 @@ func GetAccountInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create an owner query to be able to retrieve data with regards to account
-	query := staking.OwnerQuery{Height: height, Owner: pubKey}
+	//query := staking.OwnerQuery{Height: height, Owner: pubKey}
+	query := staking.OwnerQuery{Height: height, Owner: address}
 
 	// Retrieve account information using created query
-	account, err := so.AccountInfo(context.Background(), &query)
+	account, err := so.Account(context.Background(), &query)
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to get Account!"})
@@ -458,7 +468,7 @@ func GetDelegations(w http.ResponseWriter, r *http.Request) {
 	// Note Make sure that public key that is being sent is coded properly
 	// Example A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU+h+blS9pto= should be
 	// A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU%2Bh%2BblS9pto=
-	var pubKey common_signature.PublicKey
+	//var pubKey common_signature.PublicKey
 	ownerKey := r.URL.Query().Get("ownerKey")
 	if len(ownerKey) == 0 {
 
@@ -472,11 +482,20 @@ func GetDelegations(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Unmarshal text into public key object
-	err := pubKey.UnmarshalText([]byte(ownerKey))
+	//err := pubKey.UnmarshalText([]byte(ownerKey))
+	//if err != nil {
+	//	lgr.Error.Println("Failed to UnmarshalText into Public Key", err)
+	//	json.NewEncoder(w).Encode(responses.ErrorResponse{
+	//		Error: "Failed to UnmarshalText into Public Key."})
+	//	return
+	//}
+
+	var address staking.Address
+	err := address.UnmarshalBinary([]byte(ownerKey))
 	if err != nil {
-		lgr.Error.Println("Failed to UnmarshalText into Public Key", err)
+		lgr.Error.Println("Failed to UnmarshalBinary into Address", err)
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to UnmarshalText into Public Key."})
+			Error: "Failed to UnmarshalBinary into Address."})
 		return
 	}
 
@@ -496,7 +515,7 @@ func GetDelegations(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create an owner query to be able to retrieve data with regards to account
-	query := staking.OwnerQuery{Height: height, Owner: pubKey}
+	query := staking.OwnerQuery{Height: height, Owner: address}
 
 	// Return delegations for given account query
 	delegations, err := so.Delegations(context.Background(), &query)
@@ -547,7 +566,7 @@ func GetDebondingDelegations(w http.ResponseWriter, r *http.Request) {
 	// Note Make sure that public key that is being sent is coded properly
 	// Example A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU+h+blS9pto= should be
 	// A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU%2Bh%2BblS9pto=
-	var pubKey common_signature.PublicKey
+	//var pubKey common_signature.PublicKey
 	ownerKey := r.URL.Query().Get("ownerKey")
 	if len(ownerKey) == 0 {
 
@@ -561,11 +580,20 @@ func GetDebondingDelegations(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Unmarshal text into public key object
-	err := pubKey.UnmarshalText([]byte(ownerKey))
+	//err := pubKey.UnmarshalText([]byte(ownerKey))
+	//if err != nil {
+	//	lgr.Error.Println("Failed to UnmarshalText into Public Key", err)
+	//	json.NewEncoder(w).Encode(responses.ErrorResponse{
+	//		Error: "Failed to UnmarshalText into Public Key."})
+	//	return
+	//}
+
+	var address staking.Address
+	err := address.UnmarshalBinary([]byte(ownerKey))
 	if err != nil {
-		lgr.Error.Println("Failed to UnmarshalText into Public Key", err)
+		lgr.Error.Println("Failed to UnmarshalBinary into Address", err)
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to UnmarshalText into Public Key."})
+			Error: "Failed to UnmarshalBinary into Address."})
 		return
 	}
 
@@ -585,7 +613,7 @@ func GetDebondingDelegations(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Query created to retrieved Debonding Delegations for an account
-	query := staking.OwnerQuery{Height: height, Owner: pubKey}
+	query := staking.OwnerQuery{Height: height, Owner: address}
 
 	// Retrieving debonding delegations for an account using above query
 	debondingDelegations, err := so.DebondingDelegations(context.Background(),
