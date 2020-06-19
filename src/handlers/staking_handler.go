@@ -393,11 +393,11 @@ func GetAccountInfo(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	var address staking.Address
-	err := address.UnmarshalBinary([]byte(ownerKey))
+	err := address.UnmarshalText([]byte(ownerKey))
 	if err != nil {
-		lgr.Error.Println("Failed to UnmarshalBinary into Address", err)
+		lgr.Error.Println("Failed to UnmarshalText into Address", err)
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to UnmarshalBinary into Address."})
+			Error: "Failed to UnmarshalText into Address."})
 		return
 	}
 
