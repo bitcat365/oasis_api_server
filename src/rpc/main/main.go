@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/oasisprotocol/oasis-core/go/common/crypto/address"
 	common_signature "github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
-	staking "github.com/oasisprotocol/oasis-core/go/staking/api"
 )
 
 var (
@@ -23,7 +23,12 @@ func main() {
 	if err != nil {
 
 	}
-	fmt.Println(staking.NewAddress(pubKey))
+	fmt.Println(NewAddress(pubKey))
+
+	b, err := base64.StdEncoding.DecodeString(string("AKFreVYqiVbzFffBiBri7pPb/Av4"))
+	if err != nil {
+	}
+	fmt.Println(b)
 
 	var addr address.Address
 	err1 := addr.UnmarshalBech32(AddressBech32HRP, []byte("oasis1qzskk72k92y4duc47lqcsxhza6fahlqtlqyesw0p"))

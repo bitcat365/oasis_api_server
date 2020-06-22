@@ -34,6 +34,20 @@ func loadConsensusClient(socket string) (*grpc.ClientConn,
 	return connection, consensusClient
 }
 
+// loadConsensusLightClient loads consensus light client and returns it
+func loadConsensusLightClient(socket string) (*grpc.ClientConn,
+	consensus.LightClientBackend) {
+
+	// Attempt to load connection with consensus client
+	connection, consensusLightClient, err := rpc.ConsensusLightClient(socket)
+	if err != nil {
+		lgr.Error.Println("Failed to establish connection to consensus"+
+			" client : ", err)
+		return nil, nil
+	}
+	return connection, consensusLightClient
+}
+
 // GetConsensusStateToGenesis returns genesis state
 // at specified block height for Consensus.
 func GetConsensusStateToGenesis(w http.ResponseWriter, r *http.Request) {
@@ -555,4 +569,66 @@ func PublicKeyToBech32Address(w http.ResponseWriter, r *http.Request) {
 		"with Tendermint Public Key Address!")
 	json.NewEncoder(w).Encode(responses.Bech32Address{
 		Bech32Address: &cryptoAddress})
+}
+
+// GetValidatorSet
+func GetValidatorSet(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving name of node from query request
+	nodeName := r.URL.Query().Get("name")
+	confirmation, socket := checkNodeName(nodeName)
+	if confirmation == false {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Node name requested doesn't exist"})
+		return
+	}
+
+	// Retrieve height from query
+	recvHeight := r.URL.Query().Get("height")
+	height := checkHeight(recvHeight)
+	if height == -1 {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
+		return
+	}
+
+	// Attempt to load connection with consensus light client
+	connection, clo := loadConsensusLightClient(socket)
+
+	// Close connection once code underneath executes
+	defer connection.Close()
+
+	// If null object was retrieved send response
+	if clo == nil {
+
+		// Stop code here faild to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to establish connection using socket: " +
+				socket})
+		return
+	}
+
+	// Retrieve block at specific height from consensus client
+	blk, err := clo.GetValidatorSet(context.Background(), height)
+	if err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to retrieve Validator!"})
+
+		lgr.Error.Println("Request at /api/consensus/validatorset failed "+
+			"to retrieve Validator : ", err)
+		return
+	}
+
+	// Responding with retrieved block
+	lgr.Info.Println(
+		"Request at /api/consensus/validatorset responding with Block!")
+	json.NewEncoder(w).Encode(responses.ValidatorSetResponse{Blk: blk})
 }

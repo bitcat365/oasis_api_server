@@ -167,6 +167,11 @@ type BlockResponse struct {
 	Blk *consensus_api.Block `json:"result"`
 }
 
+// ValidatorSetResponse
+type ValidatorSetResponse struct {
+	Blk *consensus_api.ValidatorSet `json:"result"`
+}
+
 // EpochResponse responds with epcoh time
 type EpochResponse struct {
 	Ep epoch_api.EpochTime `json:"result"`
