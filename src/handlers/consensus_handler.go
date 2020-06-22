@@ -616,19 +616,19 @@ func GetValidatorSet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Retrieve block at specific height from consensus client
-	blk, err := clo.GetValidatorSet(context.Background(), height)
+	// Retrieve block at specific height from consensus light client
+	vs, err := clo.GetValidatorSet(context.Background(), height)
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to retrieve Validator!"})
+			Error: "Failed to retrieve ValidatorSet!"})
 
 		lgr.Error.Println("Request at /api/consensus/validatorset failed "+
-			"to retrieve Validator : ", err)
+			"to retrieve ValidatorSet : ", err)
 		return
 	}
 
-	// Responding with retrieved block
+	// Responding with retrieved ValidatorSet
 	lgr.Info.Println(
 		"Request at /api/consensus/validatorset responding with Block!")
-	json.NewEncoder(w).Encode(responses.ValidatorSetResponse{Blk: blk})
+	json.NewEncoder(w).Encode(responses.ValidatorSetResponse{Vs: vs})
 }

@@ -169,7 +169,7 @@ type BlockResponse struct {
 
 // ValidatorSetResponse
 type ValidatorSetResponse struct {
-	Blk *consensus_api.ValidatorSet `json:"result"`
+	Vs *consensus_api.ValidatorSet `json:"result"`
 }
 
 // EpochResponse responds with epcoh time
