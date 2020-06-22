@@ -169,7 +169,12 @@ type BlockResponse struct {
 
 // ValidatorSetResponse
 type ValidatorSetResponse struct {
-	Vs *consensus_api.ValidatorSet `json:"result"`
+	VS *consensus_api.ValidatorSet `json:"result"`
+}
+
+// SignedHeader
+type SignedHeader struct {
+	SH *consensus_api.SignedHeader `json:"result"`
 }
 
 // EpochResponse responds with epcoh time
