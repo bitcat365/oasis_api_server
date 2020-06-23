@@ -3,9 +3,9 @@ module github.com/SimplyVC/oasis_api_server/src
 go 1.13
 
 replace (
-	github.com/tendermint/tendermint => github.com/oasislabs/tendermint v0.33.4-oasis2
-	golang.org/x/crypto/curve25519 => github.com/oasislabs/ed25519/extra/x25519 v0.0.0-20191022155220-a426dcc8ad5f
-	golang.org/x/crypto/ed25519 => github.com/oasislabs/ed25519 v0.0.0-20191109133925-b197a691e30d
+	github.com/tendermint/tendermint => github.com/oasisprotocol/tendermint v0.33.4-oasis2
+	golang.org/x/crypto/curve25519 => github.com/oasisprotocol/ed25519/extra/x25519 v0.0.0-20200528083105-55566edd6df0
+	golang.org/x/crypto/ed25519 => github.com/oasisprotocol/ed25519 v0.0.0-20200528083105-55566edd6df0
 )
 
 require (
