@@ -638,6 +638,7 @@ func GetValidatorSet(w http.ResponseWriter, r *http.Request) {
 
 		lgr.Error.Println("Request at /api/consensus/validatorset failed "+
 			"to UnmarshalBinaryBare ValidatorSet : ", err)
+		return
 	}
 
 	// Responding with retrieved ValidatorSet
@@ -706,10 +707,11 @@ func GetSignedHeader(w http.ResponseWriter, r *http.Request) {
 	var aminoCodec = tmamino.NewCodec()
 	if err := aminoCodec.UnmarshalBinaryBare(sh.Meta, &signedHeader); err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to UnmarshalBinaryBare ValidatorSet!"})
+			Error: "Failed to UnmarshalBinaryBare SignedHeader!"})
 
-		lgr.Error.Println("Request at /api/consensus/validatorset failed "+
-			"to UnmarshalBinaryBare ValidatorSet : ", err)
+		lgr.Error.Println("Request at /api/consensus/signedheader failed "+
+			"to UnmarshalBinaryBare SignedHeader : ", err)
+		return
 	}
 
 	// Responding with retrieved SignedHeader
