@@ -174,7 +174,7 @@ type ValidatorSetResponse struct {
 
 // SignedHeader
 type SignedHeader struct {
-	SH *consensus_api.SignedHeader `json:"result"`
+	SH *mint_types.SignedHeader `json:"result"`
 }
 
 // EpochResponse responds with epcoh time
