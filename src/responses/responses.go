@@ -169,7 +169,7 @@ type BlockResponse struct {
 
 // ValidatorSetResponse
 type ValidatorSetResponse struct {
-	VS *consensus_api.ValidatorSet `json:"result"`
+	VS *mint_types.ValidatorSet `json:"result"`
 }
 
 // SignedHeader

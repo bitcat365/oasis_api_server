@@ -18,6 +18,8 @@ import (
 	consensus "github.com/oasisprotocol/oasis-core/go/consensus/api"
 	mint_api "github.com/oasisprotocol/oasis-core/go/consensus/tendermint/api"
 	"github.com/oasisprotocol/oasis-core/go/consensus/tendermint/crypto"
+	tmamino "github.com/tendermint/go-amino"
+	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // loadConsensusClient loads consensus client and returns it
@@ -618,6 +620,7 @@ func GetValidatorSet(w http.ResponseWriter, r *http.Request) {
 
 	// Retrieve ValidatorSet at specific height from consensus light client
 	vs, err := clo.GetValidatorSet(context.Background(), height)
+
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to retrieve ValidatorSet!"})
@@ -627,10 +630,20 @@ func GetValidatorSet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var aminoCodec = tmamino.NewCodec()
+	var vals tmtypes.ValidatorSet
+	if err := aminoCodec.UnmarshalBinaryBare(vs.Meta, &vals); err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to UnmarshalBinaryBare ValidatorSet!"})
+
+		lgr.Error.Println("Request at /api/consensus/validatorset failed "+
+			"to UnmarshalBinaryBare ValidatorSet : ", err)
+	}
+
 	// Responding with retrieved ValidatorSet
 	lgr.Info.Println(
 		"Request at /api/consensus/validatorset responding with ValidatorSet!")
-	json.NewEncoder(w).Encode(responses.ValidatorSetResponse{VS: vs})
+	json.NewEncoder(w).Encode(responses.ValidatorSetResponse{VS: &vals})
 }
 
 // GetSignedHeader
