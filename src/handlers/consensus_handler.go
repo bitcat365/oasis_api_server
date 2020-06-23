@@ -630,9 +630,8 @@ func GetValidatorSet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var aminoCodec = tmamino.NewCodec()
 	var vals tmtypes.ValidatorSet
-	if err := aminoCodec.UnmarshalBinaryBare(vs.Meta, &vals); err != nil {
+	if err := tmamino.UnmarshalBinaryBare(vs.Meta, &vals); err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to UnmarshalBinaryBare ValidatorSet!"})
 
