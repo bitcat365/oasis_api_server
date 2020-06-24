@@ -580,15 +580,15 @@ func Base64ToBech32Address(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 
 	// Retrieving consensus public key from the query
-	consensusKey := r.URL.Query().Get("consensus_public_key")
-	if consensusKey == "" {
+	base64Address := r.URL.Query().Get("address")
+	if base64Address == "" {
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "No Consensus Key Provided"})
 		return
 	}
 
-	b, err := base64.StdEncoding.DecodeString(consensusKey)
+	b, err := base64.StdEncoding.DecodeString(base64Address)
 	if err != nil {
 		lgr.Error.Println("Request at /api/consensus/base64bech32address "+
 			"failed to Unmarshal Consensus PublicKey : ", err)
