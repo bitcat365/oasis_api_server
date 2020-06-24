@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	//"github.com/oasisprotocol/oasis-core/go/common/crypto/address"
 	staking "github.com/oasisprotocol/oasis-core/go/staking/api"
@@ -568,7 +569,46 @@ func PublicKeyToBech32Address(w http.ResponseWriter, r *http.Request) {
 
 	// Responds with transactions retrieved above
 	lgr.Info.Println("Request at /api/consensus/pubkeybech32address responding " +
-		"with Tendermint Public Key Address!")
+		"with Bech32 Address!")
+	json.NewEncoder(w).Encode(responses.Bech32Address{
+		Bech32Address: &cryptoAddress})
+}
+
+func Base64ToBech32Address(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving consensus public key from the query
+	consensusKey := r.URL.Query().Get("consensus_public_key")
+	if consensusKey == "" {
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "No Consensus Key Provided"})
+		return
+	}
+
+	b, err := base64.StdEncoding.DecodeString(consensusKey)
+	if err != nil {
+		lgr.Error.Println("Request at /api/consensus/base64bech32address "+
+			"failed to Unmarshal Consensus PublicKey : ", err)
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to Unmarshal Public Key!"})
+		return
+	}
+
+	var cryptoAddress staking.Address
+	if err := cryptoAddress.UnmarshalBinary(b); err != nil {
+		lgr.Error.Println("Request at /api/consensus/base64bech32address "+
+			"failed to Unmarshal Consensus PublicKey : ", err)
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to Unmarshal Public Key!"})
+		return
+	}
+
+	// Responds with transactions retrieved above
+	lgr.Info.Println("Request at /api/consensus/base64bech32address responding " +
+		"with Bech32 Address!")
 	json.NewEncoder(w).Encode(responses.Bech32Address{
 		Bech32Address: &cryptoAddress})
 }

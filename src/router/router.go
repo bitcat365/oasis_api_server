@@ -67,6 +67,8 @@ func StartServer() error {
 		handler.PublicKeyToAddress).Methods("Get")
 	router.HandleFunc("/api/consensus/pubkeybech32address",
 		handler.PublicKeyToBech32Address).Methods("Get")
+	router.HandleFunc("/api/consensus/base64bech32address",
+		handler.Base64ToBech32Address).Methods("Get")
 	router.HandleFunc("/api/consensus/transactions",
 		handler.GetTransactions).Methods("Get")
 	router.HandleFunc("/api/pingnode",

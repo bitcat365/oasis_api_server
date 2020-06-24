@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/oasisprotocol/oasis-core/go/common/crypto/address"
 	"github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
-	tmcrypto "github.com/oasisprotocol/oasis-core/go/consensus/tendermint/crypto"
 )
 
 var (
@@ -20,26 +19,29 @@ type Address address.Address
 
 func main() {
 	var pubKey signature.PublicKey
-	err := pubKey.UnmarshalText([]byte("3IbxhcOu3j2o/0Mk5V3qXOfasEEm42pJpzuWAf8SREg="))
+	err := pubKey.UnmarshalText([]byte("CVzqFIADD2Ed0khGBNf4Rvh7vSNtrL1ULTkWYQszDpc="))
 	if err != nil {
-
 	}
 	fmt.Println(NewAddress(pubKey))
 
-	b, err := base64.StdEncoding.DecodeString(string("ND60v9LrslMFI46zbMsUxyeabzg="))
+	b, err := base64.StdEncoding.DecodeString(string("AKFreVYqiVbzFffBiBri7pPb/Av4"))
 	if err != nil {
 	}
 	fmt.Println(b)
 
-	tmAddr := tmcrypto.PublicKeyToTendermint(&pubKey).Address().String()
-	fmt.Println(tmAddr)
-
 	var addr address.Address
-	err1 := addr.UnmarshalBech32(AddressBech32HRP, []byte("oasis1qpc34h9cm0wrvkrepvzhcz0mpmjmr4dv6g24yayr"))
-	if err1 != nil {
-		fmt.Println(err1)
-	}
+	addr.UnmarshalBinary(b)
 	fmt.Println(addr)
+
+	//tmAddr := tmcrypto.PublicKeyToTendermint(&pubKey).Address().String()
+	//fmt.Println(tmAddr)
+
+	//var addr address.Address
+	//err1 := addr.UnmarshalBech32(AddressBech32HRP, []byte("oasis1qpc34h9cm0wrvkrepvzhcz0mpmjmr4dv6g24yayr"))
+	//if err1 != nil {
+	//	fmt.Println(err1)
+	//}
+	//fmt.Println(addr)
 }
 
 func NewAddress(pk signature.PublicKey) (a Address) {
