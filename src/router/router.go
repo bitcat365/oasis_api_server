@@ -55,6 +55,8 @@ func StartServer() error {
 		handler.GetEpoch).Methods("Get")
 	router.HandleFunc("/api/consensus/block",
 		handler.GetBlock).Methods("Get")
+	router.HandleFunc("/api/consensus/status",
+		handler.GetStatus).Methods("Get")
 	router.HandleFunc("/api/consensus/validatorset",
 		handler.GetValidatorSet).Methods("Get")
 	router.HandleFunc("/api/consensus/signedheader",

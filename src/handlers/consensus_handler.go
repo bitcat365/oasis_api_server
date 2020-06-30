@@ -759,3 +759,51 @@ func GetSignedHeader(w http.ResponseWriter, r *http.Request) {
 		"Request at /api/consensus/signedheader responding with SignedHeader!")
 	json.NewEncoder(w).Encode(responses.SignedHeader{SH: &signedHeader})
 }
+
+// GetStatus returns consensus status at specific height.
+func GetStatus(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving name of node from query request
+	nodeName := r.URL.Query().Get("name")
+	confirmation, socket := checkNodeName(nodeName)
+	if confirmation == false {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Node name requested doesn't exist"})
+		return
+	}
+
+	// Attempt to load connection with consensus client
+	connection, co := loadConsensusClient(socket)
+
+	// Close connection once code underneath executes
+	defer connection.Close()
+
+	// If null object was retrieved send response
+	if co == nil {
+
+		// Stop code here faild to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to establish connection using socket: " +
+				socket})
+		return
+	}
+
+	st, err := co.GetStatus(context.Background())
+	if err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to retrieve Status!"})
+
+		lgr.Error.Println("Request at /api/consensus/status failed "+
+			"to retrieve Status : ", err)
+		return
+	}
+
+	lgr.Info.Println(
+		"Request at /api/consensus/status responding with Block!")
+	json.NewEncoder(w).Encode(responses.StatusResponse{St: st})
+}

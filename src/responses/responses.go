@@ -167,6 +167,10 @@ type BlockResponse struct {
 	Blk *consensus_api.Block `json:"result"`
 }
 
+type StatusResponse struct {
+	St *consensus_api.Status `json:"result"`
+}
+
 // ValidatorSetResponse
 type ValidatorSetResponse struct {
 	VS *mint_types.ValidatorSet `json:"result"`
