@@ -841,7 +841,7 @@ func GetHeight(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var height = consensus.HeightLatest
+	height := checkHeight("")
 
 	lgr.Info.Println(
 		"Request at /api/consensus/status responding with Block!")
