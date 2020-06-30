@@ -171,6 +171,10 @@ type StatusResponse struct {
 	St *consensus_api.Status `json:"result"`
 }
 
+type HeightResponse struct {
+	Ht int64 `json:"result"`
+}
+
 // ValidatorSetResponse
 type ValidatorSetResponse struct {
 	VS *mint_types.ValidatorSet `json:"result"`
