@@ -151,6 +151,11 @@ type TransactionsResponse struct {
 	Transactions [][]byte `json:"result"`
 }
 
+// TransactionsWithResultsResponse responds with all transactions in block
+type TransactionsWithResultsResponse struct {
+	TransactionsWithResults *consensus_api.TransactionsWithResults `json:"result"`
+}
+
 // BlockHeaderResponse responds with Tendermint Header Type
 type BlockHeaderResponse struct {
 	BlkHeader *mint_types.Header `json:"result"`

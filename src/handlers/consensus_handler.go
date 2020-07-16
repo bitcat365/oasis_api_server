@@ -540,6 +540,70 @@ func GetTransactions(w http.ResponseWriter, r *http.Request) {
 		Transactions: transactions})
 }
 
+// GetTransactionsWithResults returns consensus block header at specific height
+func GetTransactionsWithResults(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving name of node from query request
+	nodeName := r.URL.Query().Get("name")
+	confirmation, socket := checkNodeName(nodeName)
+	if confirmation == false {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Node name requested doesn't exist"})
+		return
+	}
+
+	// Retrieving height from query
+	recvHeight := r.URL.Query().Get("height")
+	height := checkHeight(recvHeight)
+	if height == -1 {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
+		return
+	}
+
+	// Attempt to load connection with consensus client
+	connection, co := loadConsensusClient(socket)
+
+	// Close connection once code underneath executes
+	defer connection.Close()
+
+	// If null object was retrieved send response
+	if co == nil {
+
+		// Stop code here faild to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to establish connection using socket: " +
+				socket})
+		return
+	}
+
+	// Use consensus client to retrieve transactions at specific block
+	// height
+	transactions, err := co.GetTransactionsWithResults(context.Background(), height)
+	if err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to retrieve Transactions!"})
+
+		lgr.Error.Println("Request at /api/consensus/transactionswithresults "+
+			"failed to retrieve Transactions : ", err)
+		return
+	}
+
+	// Responds with transactions retrieved above
+	lgr.Info.Println("Request at /api/consensus/transactionswithresults responding" +
+		"with all transactions in specified Block!")
+	json.NewEncoder(w).Encode(responses.TransactionsWithResultsResponse{
+		TransactionsWithResults: transactions})
+}
+
 func PublicKeyToBech32Address(w http.ResponseWriter, r *http.Request) {
 
 	// Add header so that received knows they're receiving JSON
