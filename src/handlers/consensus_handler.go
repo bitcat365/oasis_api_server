@@ -3,8 +3,6 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	//"github.com/oasisprotocol/oasis-core/go/common/crypto/address"
-	staking "github.com/oasisprotocol/oasis-core/go/staking/api"
 	"net/http"
 
 	"google.golang.org/grpc"
@@ -14,12 +12,9 @@ import (
 	"github.com/SimplyVC/oasis_api_server/src/rpc"
 	"github.com/oasisprotocol/oasis-core/go/common/cbor"
 	"github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
-	common_signature "github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
 	consensus "github.com/oasisprotocol/oasis-core/go/consensus/api"
 	mint_api "github.com/oasisprotocol/oasis-core/go/consensus/tendermint/api"
 	"github.com/oasisprotocol/oasis-core/go/consensus/tendermint/crypto"
-	tmamino "github.com/tendermint/go-amino"
-	tmtypes "github.com/tendermint/tendermint/types"
 )
 
 // loadConsensusClient loads consensus client and returns it
@@ -36,20 +31,6 @@ func loadConsensusClient(socket string) (*grpc.ClientConn,
 	return connection, consensusClient
 }
 
-// loadConsensusLightClient loads consensus light client and returns it
-func loadConsensusLightClient(socket string) (*grpc.ClientConn,
-	consensus.LightClientBackend) {
-
-	// Attempt to load connection with consensus client
-	connection, consensusLightClient, err := rpc.ConsensusLightClient(socket)
-	if err != nil {
-		lgr.Error.Println("Failed to establish connection to consensus"+
-			" client : ", err)
-		return nil, nil
-	}
-	return connection, consensusLightClient
-}
-
 // GetConsensusStateToGenesis returns genesis state
 // at specified block height for Consensus.
 func GetConsensusStateToGenesis(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +41,7 @@ func GetConsensusStateToGenesis(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
+	if !confirmation {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -75,8 +56,8 @@ func GetConsensusStateToGenesis(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexepcted value found, height needs to be " +
-				"string of int!"})
+			Error: "Unexpected value found, height needs to be " +
+				"a string representing an int!"})
 		return
 	}
 
@@ -123,7 +104,7 @@ func GetEpoch(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
+	if !confirmation  {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -138,8 +119,8 @@ func GetEpoch(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexepcted value found, height needs to be " +
-				"string of int!"})
+			Error: "Unexpected value found, height needs to be " +
+				"a string representing an int!"})
 		return
 	}
 
@@ -186,7 +167,7 @@ func PingNode(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
+	if !confirmation  {
 		lgr.Info.Println("Node name requested doesn't exist")
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -240,7 +221,7 @@ func GetBlock(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
+	if !confirmation  {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -255,8 +236,8 @@ func GetBlock(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexepcted value found, height needs to be " +
-				"string of int!"})
+			Error: "Unexpected value found, height needs to be " +
+				"a string representing an int!"})
 		return
 	}
 
@@ -288,9 +269,110 @@ func GetBlock(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Responding with retrieved block
-	lgr.Info.Println(
-		"Request at /api/consensus/block responding with Block!")
+	lgr.Info.Println("Request at /api/consensus/block responding with Block!")
 	json.NewEncoder(w).Encode(responses.BlockResponse{Blk: blk})
+}
+
+// GetStatus returns the current status overview.
+func GetStatus(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving name of node from query request
+	nodeName := r.URL.Query().Get("name")
+	confirmation, socket := checkNodeName(nodeName)
+	if !confirmation  {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Node name requested doesn't exist"})
+		return
+	}
+
+	// Attempt to load connection with consensus client
+	connection, co := loadConsensusClient(socket)
+
+	// Close connection once code underneath executes
+	defer connection.Close()
+
+	// If null object was retrieved send response
+	if co == nil {
+
+		// Stop code here faild to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to establish connection using socket: " +
+				socket})
+		return
+	}
+
+	// Retrieve the current status overview
+	status, err := co.GetStatus(context.Background())
+	if err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to retrieve Status!"})
+
+		lgr.Error.Println("Request at /api/consensus/status failed "+
+			"to retrieve Status : ", err)
+		return
+	}
+
+	// Responding with retrieved block
+	lgr.Info.Println("Request at /api/consensus/status responding with Status!")
+	json.NewEncoder(w).Encode(responses.StatusResponse{Status: status})
+}
+
+
+// GetGenesisDocument returns the original genesis document.
+func GetGenesisDocument(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving name of node from query request
+	nodeName := r.URL.Query().Get("name")
+	confirmation, socket := checkNodeName(nodeName)
+	if !confirmation  {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Node name requested doesn't exist"})
+		return
+	}
+
+	// Attempt to load connection with consensus client
+	connection, co := loadConsensusClient(socket)
+
+	// Close connection once code underneath executes
+	defer connection.Close()
+
+	// If null object was retrieved send response
+	if co == nil {
+
+		// Stop code here faild to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to establish connection using socket: " +
+				socket})
+		return
+	}
+
+	// Retrieve the current status overview
+	genesisDocument, err := co.GetGenesisDocument(context.Background())
+	if err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to retrieve Status!"})
+
+		lgr.Error.Println("Request at /api/consensus/genesisdocument failed "+
+			"to retrieve Genesis Document : ", err)
+		return
+	}
+
+	// Responding with retrieved block
+	lgr.Info.Println(
+		"Request at /api/consensus/genesisdocument responding with Genesis " +
+		"Document!")
+	json.NewEncoder(w).Encode(responses.GenesisDocumentResponse{GenesisDocument: 
+		genesisDocument})
 }
 
 // GetBlockHeader returns consensus block header at specific height
@@ -302,7 +384,7 @@ func GetBlockHeader(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
+	if !confirmation  {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -317,8 +399,8 @@ func GetBlockHeader(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexepcted value found, height needs to be " +
-				"string of int!"})
+			Error: "Unexpected value found, height needs to be " +
+				"a string representing an int!"})
 		return
 	}
 
@@ -376,7 +458,7 @@ func GetBlockLastCommit(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
+	if !confirmation  {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -391,8 +473,8 @@ func GetBlockLastCommit(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexepcted value found, height needs to be " +
-				"string of int!"})
+			Error: "Unexpected value found, height needs to be " +
+				"a string representing an int!"})
 		return
 	}
 
@@ -484,7 +566,7 @@ func GetTransactions(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
+	if !confirmation  {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -499,8 +581,8 @@ func GetTransactions(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexepcted value found, height needs to be " +
-				"string of int!"})
+			Error: "Unexpected value found, height needs to be " +
+				"a string representing an int!"})
 		return
 	}
 
@@ -537,185 +619,4 @@ func GetTransactions(w http.ResponseWriter, r *http.Request) {
 		"with all transactions in specified Block!")
 	json.NewEncoder(w).Encode(responses.TransactionsResponse{
 		Transactions: transactions})
-}
-
-func PublicKeyToBech32Address(w http.ResponseWriter, r *http.Request) {
-
-	// Add header so that received knows they're receiving JSON
-	w.Header().Add("Content-Type", "application/json")
-
-	// Retrieving consensus public key from the query
-	consensusKey := r.URL.Query().Get("consensus_public_key")
-	if consensusKey == "" {
-		// Stop code here no need to establish connection and reply
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "No Consensus Key Provided"})
-		return
-	}
-	var pubKey common_signature.PublicKey
-
-	err := pubKey.UnmarshalText([]byte(consensusKey))
-	if err != nil {
-		lgr.Error.Println("Request at /api/consensus/pubkeybech32address "+
-			"failed to Unmarshal Consensus PublicKey : ", err)
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to Unmarshal Public Key!"})
-		return
-	}
-
-	//var AddressV0Context = address.NewContext("oasis-core/address: staking", 0)
-	cryptoAddress := staking.NewAddress(pubKey)
-
-	// Responds with transactions retrieved above
-	lgr.Info.Println("Request at /api/consensus/pubkeybech32address responding " +
-		"with Tendermint Public Key Address!")
-	json.NewEncoder(w).Encode(responses.Bech32Address{
-		Bech32Address: &cryptoAddress})
-}
-
-// GetValidatorSet
-func GetValidatorSet(w http.ResponseWriter, r *http.Request) {
-
-	// Add header so that received knows they're receiving JSON
-	w.Header().Add("Content-Type", "application/json")
-
-	// Retrieving name of node from query request
-	nodeName := r.URL.Query().Get("name")
-	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
-
-		// Stop code here no need to establish connection and reply
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Node name requested doesn't exist"})
-		return
-	}
-
-	// Retrieve height from query
-	recvHeight := r.URL.Query().Get("height")
-	height := checkHeight(recvHeight)
-	if height == -1 {
-
-		// Stop code here no need to establish connection and reply
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexepcted value found, height needs to be " +
-				"string of int!"})
-		return
-	}
-
-	// Attempt to load connection with consensus light client
-	connection, clo := loadConsensusLightClient(socket)
-
-	// Close connection once code underneath executes
-	defer connection.Close()
-
-	// If null object was retrieved send response
-	if clo == nil {
-
-		// Stop code here faild to establish connection and reply
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to establish connection using socket: " +
-				socket})
-		return
-	}
-
-	// Retrieve ValidatorSet at specific height from consensus light client
-	vs, err := clo.GetValidatorSet(context.Background(), height)
-
-	if err != nil {
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to retrieve ValidatorSet!"})
-
-		lgr.Error.Println("Request at /api/consensus/validatorset failed "+
-			"to retrieve ValidatorSet : ", err)
-		return
-	}
-
-	var vals tmtypes.ValidatorSet
-	var aminoCodec = tmamino.NewCodec()
-	if err := aminoCodec.UnmarshalBinaryBare(vs.Meta, &vals); err != nil {
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to UnmarshalBinaryBare ValidatorSet!"})
-
-		lgr.Error.Println("Request at /api/consensus/validatorset failed "+
-			"to UnmarshalBinaryBare ValidatorSet : ", err)
-		return
-	}
-
-	// Responding with retrieved ValidatorSet
-	lgr.Info.Println(
-		"Request at /api/consensus/validatorset responding with ValidatorSet!")
-	json.NewEncoder(w).Encode(responses.ValidatorSetResponse{VS: &vals})
-}
-
-// GetSignedHeader
-func GetSignedHeader(w http.ResponseWriter, r *http.Request) {
-
-	// Add header so that received knows they're receiving JSON
-	w.Header().Add("Content-Type", "application/json")
-
-	// Retrieving name of node from query request
-	nodeName := r.URL.Query().Get("name")
-	confirmation, socket := checkNodeName(nodeName)
-	if confirmation == false {
-
-		// Stop code here no need to establish connection and reply
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Node name requested doesn't exist"})
-		return
-	}
-
-	// Retrieve height from query
-	recvHeight := r.URL.Query().Get("height")
-	height := checkHeight(recvHeight)
-	if height == -1 {
-
-		// Stop code here no need to establish connection and reply
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexepcted value found, height needs to be " +
-				"string of int!"})
-		return
-	}
-
-	// Attempt to load connection with consensus light client
-	connection, clo := loadConsensusLightClient(socket)
-
-	// Close connection once code underneath executes
-	defer connection.Close()
-
-	// If null object was retrieved send response
-	if clo == nil {
-
-		// Stop code here faild to establish connection and reply
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to establish connection using socket: " +
-				socket})
-		return
-	}
-
-	// Retrieve SignedHeader at specific height from consensus light client
-	sh, err := clo.GetSignedHeader(context.Background(), height)
-	if err != nil {
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to retrieve SignedHeader!"})
-
-		lgr.Error.Println("Request at /api/consensus/signedheader failed "+
-			"to retrieve SignedHeader : ", err)
-		return
-	}
-
-	var signedHeader tmtypes.SignedHeader
-	var aminoCodec = tmamino.NewCodec()
-	if err := aminoCodec.UnmarshalBinaryBare(sh.Meta, &signedHeader); err != nil {
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to UnmarshalBinaryBare SignedHeader!"})
-
-		lgr.Error.Println("Request at /api/consensus/signedheader failed "+
-			"to UnmarshalBinaryBare SignedHeader : ", err)
-		return
-	}
-
-	// Responding with retrieved SignedHeader
-	lgr.Info.Println(
-		"Request at /api/consensus/signedheader responding with SignedHeader!")
-	json.NewEncoder(w).Encode(responses.SignedHeader{SH: &signedHeader})
 }

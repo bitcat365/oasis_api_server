@@ -15,6 +15,7 @@ import (
 	scheduler_api "github.com/oasisprotocol/oasis-core/go/scheduler/api"
 	sentry_api "github.com/oasisprotocol/oasis-core/go/sentry/api"
 	staking_api "github.com/oasisprotocol/oasis-core/go/staking/api"
+	document_api "github.com/oasisprotocol/oasis-core/go/genesis/api"
 	tmed "github.com/tendermint/tendermint/crypto"
 	mint_types "github.com/tendermint/tendermint/types"
 )
@@ -88,12 +89,17 @@ type DelegationsResponse struct {
 
 // AccountResponse responds with an account
 type AccountResponse struct {
-	AccountInfo *staking_api.Account `json:"result"`
+	Account *staking_api.Account `json:"result"`
 }
 
-// AllAccountsResponse responds with list of Accounts
-type AllAccountsResponse struct {
-	AllAccounts []staking_api.Address `json:"result"`
+// AllAddressesResponse responds with list of Accounts
+type AllAddressesResponse struct {
+	AllAddresses []staking_api.Address `json:"result"`
+}
+
+// AddressResponse responds with a staking address
+type AddressResponse struct {
+	Address staking_api.Address `json:"result"`
 }
 
 // StakingGenesisResponse responds with Staking Genesis File
@@ -114,6 +120,16 @@ type RegistryEntityResponse struct {
 // RegistryNodeResponse responds with details of single Node
 type RegistryNodeResponse struct {
 	Node *common_node.Node `json:"result"`
+}
+
+// RegistryEventsResponse responds with events at specified block height.
+type RegistryEventsResponse struct {
+	Events []registry_api.Event `json:"results"`
+}
+
+// NodeStatusResponse responds with a node's status.
+type NodeStatusResponse struct {
+	NodeStatus *registry_api.NodeStatus `json:"result"`
 }
 
 // RegistryGenesisResponse responds with genesis state of registry
@@ -167,16 +183,6 @@ type BlockResponse struct {
 	Blk *consensus_api.Block `json:"result"`
 }
 
-// ValidatorSetResponse
-type ValidatorSetResponse struct {
-	VS *mint_types.ValidatorSet `json:"result"`
-}
-
-// SignedHeader
-type SignedHeader struct {
-	SH *mint_types.SignedHeader `json:"result"`
-}
-
 // EpochResponse responds with epcoh time
 type EpochResponse struct {
 	Ep epoch_api.EpochTime `json:"result"`
@@ -202,9 +208,19 @@ type ConnectionsResponse struct {
 	Results []string `json:"result"`
 }
 
-// Bech32 Address from public key
-type Bech32Address struct {
-	Bech32Address *staking_api.Address `json:"result"`
+// ConsensusParametersResponse responds with the staking consensus parameters
+type ConsensusParametersResponse struct {
+	ConsensusParameters *staking_api.ConsensusParameters `json:"result"`
+}
+
+// StatusResponse responds with the current status overview
+type StatusResponse struct {
+	Status *consensus_api.Status `json:"result"`
+}
+
+// GenesisDocumentResponse reponds with the original genesis document.
+type GenesisDocumentResponse struct {
+	GenesisDocument *document_api.Document `json:"result"`
 }
 
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.
