@@ -116,6 +116,16 @@ type RegistryNodeResponse struct {
 	Node *common_node.Node `json:"result"`
 }
 
+// RegistryEventsResponse responds with events at specified block height.
+type RegistryEventsResponse struct {
+	Events []*registry_api.Event `json:"results"`
+}
+
+// NodeStatusResponse responds with a node's status.
+type NodeStatusResponse struct {
+	NodeStatus *registry_api.NodeStatus `json:"result"`
+}
+
 // RegistryGenesisResponse responds with genesis state of registry
 type RegistryGenesisResponse struct {
 	GenesisRegistry *registry_api.Genesis `json:"result"`
