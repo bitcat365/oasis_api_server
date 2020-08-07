@@ -260,7 +260,9 @@ func GetRuntimes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Retrieving runtimes at specific block height from registry client
-	runtimes, err := ro.GetRuntimes(context.Background(), height)
+
+	query := registry.GetRuntimesQuery{Height: height, IncludeSuspended: true}
+	runtimes, err := ro.GetRuntimes(context.Background(), &query)
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to get runtimes!"})
