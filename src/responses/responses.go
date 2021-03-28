@@ -22,7 +22,7 @@ import (
 
 // StakingEvents responds with a list of events
 type StakingEvents struct {
-	StakingEvents []staking_api.Event `json:"result"`
+	StakingEvents []*staking_api.Event `json:"result"`
 }
 
 // TendermintAddress responds with a tendermint public key address
