@@ -21,7 +21,7 @@ require (
 	github.com/claudetech/ini v0.0.0-20140910072410-73e6100d9d51
 	github.com/gorilla/mux v1.7.4
 	github.com/mackerelio/go-osstat v0.1.0
-	github.com/oasisprotocol/oasis-core/go v0.2012.5
+	github.com/oasisprotocol/oasis-core/go 	v0.2100.1
 	github.com/prometheus/common v0.14.0
 	github.com/tendermint/tendermint v0.34.8-oasis1
 	github.com/zenazn/goji v0.9.0
