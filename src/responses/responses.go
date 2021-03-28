@@ -2,7 +2,6 @@ package responses
 
 import (
 	"github.com/mackerelio/go-osstat/cpu"
-	"github.com/mackerelio/go-osstat/disk"
 	"github.com/mackerelio/go-osstat/memory"
 	"github.com/mackerelio/go-osstat/network"
 	common_entity "github.com/oasisprotocol/oasis-core/go/common/entity"
@@ -11,7 +10,6 @@ import (
 	consensus_api "github.com/oasisprotocol/oasis-core/go/consensus/api"
 	//epoch_api "github.com/oasisprotocol/oasis-core/go/epochtime/api"
 	beacon_api "github.com/oasisprotocol/oasis-core/go/beacon/api"
-	document_api "github.com/oasisprotocol/oasis-core/go/genesis/api"
 	gen_api "github.com/oasisprotocol/oasis-core/go/genesis/api"
 	registry_api "github.com/oasisprotocol/oasis-core/go/registry/api"
 	scheduler_api "github.com/oasisprotocol/oasis-core/go/scheduler/api"
@@ -44,11 +42,6 @@ type NetworkResponse struct {
 // CPUResponse responds with CPU statistics of system
 type CPUResponse struct {
 	CPU *cpu.Stats `json:"result"`
-}
-
-// DiskResponse responds with memory statistics of system
-type DiskResponse struct {
-	Disk []disk.Stats `json:"result"`
 }
 
 // MemoryResponse responds with memory statistics of system
