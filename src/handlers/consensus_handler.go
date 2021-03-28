@@ -13,6 +13,7 @@ import (
 	"github.com/oasisprotocol/oasis-core/go/common/cbor"
 	"github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
 	consensus "github.com/oasisprotocol/oasis-core/go/consensus/api"
+	beacon "github.com/oasisprotocol/oasis-core/go/beacon/api"
 	mint_api "github.com/oasisprotocol/oasis-core/go/consensus/tendermint/api"
 	"github.com/oasisprotocol/oasis-core/go/consensus/tendermint/crypto"
 )
@@ -29,6 +30,20 @@ func loadConsensusClient(socket string) (*grpc.ClientConn,
 		return nil, nil
 	}
 	return connection, consensusClient
+}
+
+// loadBeaconClient loads beacon client and returns it
+func loadBeaconClient(socket string) (*grpc.ClientConn,
+	beacon.Backend) {
+
+	// Attempt to load connection with beacon client
+	connection, beaconClient, err := rpc.BeaconClient(socket)
+	if err != nil {
+		lgr.Error.Println("Failed to establish connection to beacon"+
+			" client : ", err)
+		return nil, nil
+	}
+	return connection, beaconClient
 }
 
 // GetConsensusStateToGenesis returns genesis state
@@ -124,14 +139,14 @@ func GetEpoch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Attempt to load connection with consensus client
-	connection, co := loadConsensusClient(socket)
+	// Attempt to load connection with beacon client
+	connection, be := loadBeaconClient(socket)
 
 	// Close connection once code underneath executes
 	defer connection.Close()
 
 	// If null object was retrieved send response
-	if co == nil {
+	if be == nil {
 		// Stop code here faild to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to establish connection using socket: " +
@@ -140,7 +155,7 @@ func GetEpoch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return epcoh of specific height
-	epoch, err := co.GetEpoch(context.Background(), height)
+	epoch, err := be.GetEpoch(context.Background(), height)
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to retrieve Epoch of Block!"})

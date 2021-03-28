@@ -12,6 +12,7 @@ import (
 	cmnGrpc "github.com/oasisprotocol/oasis-core/go/common/grpc"
 	"github.com/oasisprotocol/oasis-core/go/common/identity"
 	consensus "github.com/oasisprotocol/oasis-core/go/consensus/api"
+	beacon "github.com/oasisprotocol/oasis-core/go/beacon/api"
 	control "github.com/oasisprotocol/oasis-core/go/control/api"
 	registry "github.com/oasisprotocol/oasis-core/go/registry/api"
 	scheduler "github.com/oasisprotocol/oasis-core/go/scheduler/api"
@@ -86,6 +87,19 @@ func ConsensusClient(address string) (*grpc.ClientConn,
 	}
 
 	client := consensus.NewConsensusClient(conn)
+	return conn, client, nil
+}
+
+// BeaconClient - initiate new beacon client
+func BeaconClient(address string) (*grpc.ClientConn,
+	beacon.Backend, error) {
+	conn, err := Connect(address)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to establish connection "+
+			"with node %s", address)
+	}
+
+	client := beacon.NewBeaconClient(conn)
 	return conn, client, nil
 }
 
