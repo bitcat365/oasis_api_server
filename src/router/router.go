@@ -57,16 +57,22 @@ func StartServer() error {
 		handler.GetBlock).Methods("Get")
 	router.HandleFunc("/api/consensus/status",
 		handler.GetStatus).Methods("Get")
-	router.HandleFunc("/api/consensus/genesisdocument",
-		handler.GetGenesisDocument).Methods("Get")
+	router.HandleFunc("/api/consensus/height",
+		handler.GetHeight).Methods("Get")
 	router.HandleFunc("/api/consensus/blockheader",
 		handler.GetBlockHeader).Methods("Get")
 	router.HandleFunc("/api/consensus/blocklastcommit",
 		handler.GetBlockLastCommit).Methods("Get")
 	router.HandleFunc("/api/consensus/pubkeyaddress",
 		handler.PublicKeyToAddress).Methods("Get")
+	router.HandleFunc("/api/consensus/pubkeybech32address",
+		handler.PublicKeyToBech32Address).Methods("Get")
+	router.HandleFunc("/api/consensus/base64bech32address",
+		handler.Base64ToBech32Address).Methods("Get")
 	router.HandleFunc("/api/consensus/transactions",
 		handler.GetTransactions).Methods("Get")
+	router.HandleFunc("/api/consensus/transactionswithresults",
+		handler.GetTransactionsWithResults).Methods("Get")
 	router.HandleFunc("/api/pingnode",
 		handler.PingNode).Methods("Get")
 
@@ -95,20 +101,14 @@ func StartServer() error {
 		handler.GetTotalSupply).Methods("Get")
 	router.HandleFunc("/api/staking/commonpool",
 		handler.GetCommonPool).Methods("Get")
-	router.HandleFunc("/api/staking/lastblockfees",
-		handler.GetLastBlockFees).Methods("Get")
 	router.HandleFunc("/api/staking/genesis",
 		handler.GetStakingStateToGenesis).Methods("Get")
 	router.HandleFunc("/api/staking/threshold",
 		handler.GetThreshold).Methods("Get")
-	router.HandleFunc("/api/staking/addresses",
-		handler.GetAddresses).Methods("Get")
-	router.HandleFunc("/api/staking/publickeytoaddress",
-		handler.GetAddressFromPublicKey).Methods("Get")
-	router.HandleFunc("/api/staking/consensusparameters",
-		handler.GetConsensusParameters).Methods("Get")
-	router.HandleFunc("/api/staking/account",
-		handler.GetAccount).Methods("Get")
+	router.HandleFunc("/api/staking/accounts",
+		handler.GetAccounts).Methods("Get")
+	router.HandleFunc("/api/staking/accountinfo",
+		handler.GetAccountInfo).Methods("Get")
 	router.HandleFunc("/api/staking/delegations",
 		handler.GetDelegations).Methods("Get")
 	router.HandleFunc("/api/staking/debondingdelegations",

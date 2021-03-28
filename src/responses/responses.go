@@ -15,14 +15,13 @@ import (
 	scheduler_api "github.com/oasisprotocol/oasis-core/go/scheduler/api"
 	sentry_api "github.com/oasisprotocol/oasis-core/go/sentry/api"
 	staking_api "github.com/oasisprotocol/oasis-core/go/staking/api"
-	document_api "github.com/oasisprotocol/oasis-core/go/genesis/api"
 	tmed "github.com/tendermint/tendermint/crypto"
 	mint_types "github.com/tendermint/tendermint/types"
 )
 
 // StakingEvents responds with a list of events
 type StakingEvents struct {
-	StakingEvents []staking_api.Event `json:"result"`
+	StakingEvents []*staking_api.Event `json:"result"`
 }
 
 // TendermintAddress responds with a tendermint public key address
@@ -89,17 +88,12 @@ type DelegationsResponse struct {
 
 // AccountResponse responds with an account
 type AccountResponse struct {
-	Account *staking_api.Account `json:"result"`
+	AccountInfo *staking_api.Account `json:"result"`
 }
 
-// AllAddressesResponse responds with list of Accounts
-type AllAddressesResponse struct {
-	AllAddresses []staking_api.Address `json:"result"`
-}
-
-// AddressResponse responds with a staking address
-type AddressResponse struct {
-	Address staking_api.Address `json:"result"`
+// AllAccountsResponse responds with list of Accounts
+type AllAccountsResponse struct {
+	AllAccounts []staking_api.Address `json:"result"`
 }
 
 // StakingGenesisResponse responds with Staking Genesis File
@@ -124,7 +118,7 @@ type RegistryNodeResponse struct {
 
 // RegistryEventsResponse responds with events at specified block height.
 type RegistryEventsResponse struct {
-	Events []registry_api.Event `json:"results"`
+	Events []*registry_api.Event `json:"results"`
 }
 
 // NodeStatusResponse responds with a node's status.
@@ -167,6 +161,11 @@ type TransactionsResponse struct {
 	Transactions [][]byte `json:"result"`
 }
 
+// TransactionsWithResultsResponse responds with all transactions in block
+type TransactionsWithResultsResponse struct {
+	TransactionsWithResults *consensus_api.TransactionsWithResults `json:"result"`
+}
+
 // BlockHeaderResponse responds with Tendermint Header Type
 type BlockHeaderResponse struct {
 	BlkHeader *mint_types.Header `json:"result"`
@@ -181,6 +180,24 @@ type BlockLastCommitResponse struct {
 // message
 type BlockResponse struct {
 	Blk *consensus_api.Block `json:"result"`
+}
+
+type StatusResponse struct {
+	St *consensus_api.Status `json:"result"`
+}
+
+type HeightResponse struct {
+	Ht int64 `json:"result"`
+}
+
+// ValidatorSetResponse
+type ValidatorSetResponse struct {
+	VS *mint_types.ValidatorSet `json:"result"`
+}
+
+// SignedHeader
+type SignedHeader struct {
+	SH *mint_types.SignedHeader `json:"result"`
 }
 
 // EpochResponse responds with epcoh time
@@ -208,19 +225,9 @@ type ConnectionsResponse struct {
 	Results []string `json:"result"`
 }
 
-// ConsensusParametersResponse responds with the staking consensus parameters
-type ConsensusParametersResponse struct {
-	ConsensusParameters *staking_api.ConsensusParameters `json:"result"`
-}
-
-// StatusResponse responds with the current status overview
-type StatusResponse struct {
-	Status *consensus_api.Status `json:"result"`
-}
-
-// GenesisDocumentResponse reponds with the original genesis document.
-type GenesisDocumentResponse struct {
-	GenesisDocument *document_api.Document `json:"result"`
+// Bech32 Address from public key
+type Bech32Address struct {
+	Bech32Address *staking_api.Address `json:"result"`
 }
 
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.
