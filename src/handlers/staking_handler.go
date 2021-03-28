@@ -589,8 +589,8 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(responses.AccountResponse{Account: account})
 }
 
-// GetDelegations returns list of delegations for given owner
-func GetDelegations(w http.ResponseWriter, r *http.Request) {
+// GetDelegationsFor returns list of delegations for given owner
+func GetDelegationsFor(w http.ResponseWriter, r *http.Request) {
 
 	// Add header so that received knows they're receiving JSON
 	w.Header().Add("Content-Type", "application/json")
@@ -623,7 +623,7 @@ func GetDelegations(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		lgr.Warning.Println(
-			"Request at /api/staking/delegations failed, address can't be " +
+			"Request at /api/staking/delegationsfor failed, address can't be " +
 				"empty!")
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "address can't be empty!"})
@@ -658,13 +658,13 @@ func GetDelegations(w http.ResponseWriter, r *http.Request) {
 	query := staking.OwnerQuery{Height: height, Owner: address}
 
 	// Return delegations for given account query
-	delegations, err := so.Delegations(context.Background(), &query)
+	delegationsFor, err := so.DelegationsFor(context.Background(), &query)
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to get Delegations!"})
 
 		lgr.Error.Println(
-			"Request at /api/staking/delegations failed to retrieve "+
+			"Request at /api/staking/delegationsfor failed to retrieve "+
 				"Delegations : ", err)
 		return
 	}
@@ -673,12 +673,12 @@ func GetDelegations(w http.ResponseWriter, r *http.Request) {
 	lgr.Info.Println("Request at /api/staking/delegations responding with " +
 		"delegations!")
 	json.NewEncoder(w).Encode(responses.DelegationsResponse{Delegations:
-		delegations})
+	delegationsFor})
 }
 
-// GetDebondingDelegations returns list of debonding delegations
+// GetDebondingDelegationsFor returns list of debonding delegations
 // for given owner (delegator).
-func GetDebondingDelegations(w http.ResponseWriter, r *http.Request) {
+func GetDebondingDelegationsFor(w http.ResponseWriter, r *http.Request) {
 
 	// Add header so that received knows they're receiving JSON
 	w.Header().Add("Content-Type", "application/json")
@@ -745,23 +745,23 @@ func GetDebondingDelegations(w http.ResponseWriter, r *http.Request) {
 	query := staking.OwnerQuery{Height: height, Owner: address}
 
 	// Retrieving debonding delegations for an account using above query
-	debondingDelegations, err := so.DebondingDelegations(context.Background(),
+	debondingDelegationsFor, err := so.DebondingDelegationsFor(context.Background(),
 		&query)
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to get Debonding Delegations!"})
 		lgr.Error.Println(
-			"Request at /api/staking/debondingdelegations failed to retrieve"+
+			"Request at /api/staking/debondingdelegationsfor failed to retrieve"+
 				" Debonding Delegations : ", err)
 		return
 	}
 
 	// Responding with debonding delegations for given accounts
 	lgr.Info.Println(
-		"Request at /api/staking/debondingdelegations responding with " +
+		"Request at /api/staking/debondingdelegationsfor responding with " +
 			"Debonding Delegations!")
 	json.NewEncoder(w).Encode(responses.DebondingDelegationsResponse{
-		DebondingDelegations: debondingDelegations})
+		DebondingDelegations: debondingDelegationsFor})
 }
 
 // GetEvents returns events at a specific height.
