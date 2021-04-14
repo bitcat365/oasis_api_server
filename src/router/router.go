@@ -144,6 +144,12 @@ func StartServer() error {
 	router.HandleFunc("/api/sentry/addresses",
 		handler.GetSentryAddresses).Methods("Get")
 
+	// Router Handlers to handle Governance API Calls
+	router.HandleFunc("/api/governance/activeproposals",
+		handler.GetActiveProposals).Methods("Get")
+	router.HandleFunc("/api/governance/proposals",
+		handler.GetProposals).Methods("Get")
+
 	log.Fatal(graceful.ListenAndServe(":"+apiPort, router))
 	return nil
 }

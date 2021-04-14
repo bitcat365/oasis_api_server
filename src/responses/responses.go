@@ -8,6 +8,8 @@ import (
 	common_node "github.com/oasisprotocol/oasis-core/go/common/node"
 	common_quantity "github.com/oasisprotocol/oasis-core/go/common/quantity"
 	consensus_api "github.com/oasisprotocol/oasis-core/go/consensus/api"
+	governance "github.com/oasisprotocol/oasis-core/go/governance/api"
+
 	//epoch_api "github.com/oasisprotocol/oasis-core/go/epochtime/api"
 	beacon_api "github.com/oasisprotocol/oasis-core/go/beacon/api"
 	gen_api "github.com/oasisprotocol/oasis-core/go/genesis/api"
@@ -223,6 +225,11 @@ type ConnectionsResponse struct {
 // Bech32 Address from public key
 type Bech32Address struct {
 	Bech32Address *staking_api.Address `json:"result"`
+}
+
+// Proposal with governance Document
+type ProposalsResponse struct {
+	Proposals []*governance.Proposal `json:"result"`
 }
 
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.
