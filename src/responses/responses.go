@@ -237,5 +237,10 @@ type ProposalResponse struct {
 	Proposal *governance.Proposal `json:"result"`
 }
 
+// VotesResponse with governance Document
+type VotesResponse struct {
+	Votes []*governance.VoteEntry `json:"result"`
+}
+
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.
 var SuccessResponsed = SuccessResponse{Result: "pong"}
