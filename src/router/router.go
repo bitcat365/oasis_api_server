@@ -149,6 +149,8 @@ func StartServer() error {
 		handler.GetActiveProposals).Methods("Get")
 	router.HandleFunc("/api/governance/proposals",
 		handler.GetProposals).Methods("Get")
+	router.HandleFunc("/api/governance/proposal",
+		handler.GetProposal).Methods("Get")
 
 	log.Fatal(graceful.ListenAndServe(":"+apiPort, router))
 	return nil
