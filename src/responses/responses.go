@@ -2,14 +2,16 @@ package responses
 
 import (
 	"github.com/mackerelio/go-osstat/cpu"
-	"github.com/mackerelio/go-osstat/disk"
 	"github.com/mackerelio/go-osstat/memory"
 	"github.com/mackerelio/go-osstat/network"
 	common_entity "github.com/oasisprotocol/oasis-core/go/common/entity"
 	common_node "github.com/oasisprotocol/oasis-core/go/common/node"
 	common_quantity "github.com/oasisprotocol/oasis-core/go/common/quantity"
 	consensus_api "github.com/oasisprotocol/oasis-core/go/consensus/api"
-	epoch_api "github.com/oasisprotocol/oasis-core/go/epochtime/api"
+	governance "github.com/oasisprotocol/oasis-core/go/governance/api"
+
+	//epoch_api "github.com/oasisprotocol/oasis-core/go/epochtime/api"
+	beacon_api "github.com/oasisprotocol/oasis-core/go/beacon/api"
 	gen_api "github.com/oasisprotocol/oasis-core/go/genesis/api"
 	registry_api "github.com/oasisprotocol/oasis-core/go/registry/api"
 	scheduler_api "github.com/oasisprotocol/oasis-core/go/scheduler/api"
@@ -42,11 +44,6 @@ type NetworkResponse struct {
 // CPUResponse responds with CPU statistics of system
 type CPUResponse struct {
 	CPU *cpu.Stats `json:"result"`
-}
-
-// DiskResponse responds with memory statistics of system
-type DiskResponse struct {
-	Disk []disk.Stats `json:"result"`
 }
 
 // MemoryResponse responds with memory statistics of system
@@ -202,7 +199,7 @@ type SignedHeader struct {
 
 // EpochResponse responds with epcoh time
 type EpochResponse struct {
-	Ep epoch_api.EpochTime `json:"result"`
+	Ep beacon_api.EpochTime `json:"result"`
 }
 
 // ConsensusGenesisResponse with consensus Genesis Document
@@ -228,6 +225,21 @@ type ConnectionsResponse struct {
 // Bech32 Address from public key
 type Bech32Address struct {
 	Bech32Address *staking_api.Address `json:"result"`
+}
+
+// ProposalsResponse with governance Document
+type ProposalsResponse struct {
+	Proposals []*governance.Proposal `json:"result"`
+}
+
+// ProposalResponse with governance Document
+type ProposalResponse struct {
+	Proposal *governance.Proposal `json:"result"`
+}
+
+// VotesResponse with governance Document
+type VotesResponse struct {
+	Votes []*governance.VoteEntry `json:"result"`
 }
 
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.

@@ -9,10 +9,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
+	beacon "github.com/oasisprotocol/oasis-core/go/beacon/api"
 	cmnGrpc "github.com/oasisprotocol/oasis-core/go/common/grpc"
 	"github.com/oasisprotocol/oasis-core/go/common/identity"
 	consensus "github.com/oasisprotocol/oasis-core/go/consensus/api"
 	control "github.com/oasisprotocol/oasis-core/go/control/api"
+	governance "github.com/oasisprotocol/oasis-core/go/governance/api"
 	registry "github.com/oasisprotocol/oasis-core/go/registry/api"
 	scheduler "github.com/oasisprotocol/oasis-core/go/scheduler/api"
 	sentry "github.com/oasisprotocol/oasis-core/go/sentry/api"
@@ -76,6 +78,20 @@ func RegistryClient(address string) (*grpc.ClientConn,
 	return conn, client, nil
 }
 
+// GovernanceClient - initiate new governance client
+func GovernanceClient(address string) (*grpc.ClientConn,
+	governance.Backend, error) {
+
+	conn, err := Connect(address)
+	if err != nil {
+		return nil, nil, fmt.Errorf("Failed to establish Governance "+
+			"Client Connection with node %s", address)
+	}
+
+	client := governance.NewGovernanceClient(conn)
+	return conn, client, nil
+}
+
 // ConsensusClient - initiate new consensus client
 func ConsensusClient(address string) (*grpc.ClientConn,
 	consensus.ClientBackend, error) {
@@ -86,6 +102,19 @@ func ConsensusClient(address string) (*grpc.ClientConn,
 	}
 
 	client := consensus.NewConsensusClient(conn)
+	return conn, client, nil
+}
+
+// BeaconClient - initiate new beacon client
+func BeaconClient(address string) (*grpc.ClientConn,
+	beacon.Backend, error) {
+	conn, err := Connect(address)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to establish connection "+
+			"with node %s", address)
+	}
+
+	client := beacon.NewBeaconClient(conn)
 	return conn, client, nil
 }
 

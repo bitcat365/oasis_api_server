@@ -110,9 +110,9 @@ func StartServer() error {
 	router.HandleFunc("/api/staking/accountinfo",
 		handler.GetAccountInfo).Methods("Get")
 	router.HandleFunc("/api/staking/delegations",
-		handler.GetDelegations).Methods("Get")
+		handler.GetDelegationsFor).Methods("Get")
 	router.HandleFunc("/api/staking/debondingdelegations",
-		handler.GetDebondingDelegations).Methods("Get")
+		handler.GetDebondingDelegationsFor).Methods("Get")
 	router.HandleFunc("/api/staking/events",
 		handler.GetEvents).Methods("Get")
 
@@ -143,6 +143,16 @@ func StartServer() error {
 	// Router Handlers to handle Sentry API Calls
 	router.HandleFunc("/api/sentry/addresses",
 		handler.GetSentryAddresses).Methods("Get")
+
+	// Router Handlers to handle Governance API Calls
+	router.HandleFunc("/api/governance/activeproposals",
+		handler.GetActiveProposals).Methods("Get")
+	router.HandleFunc("/api/governance/proposals",
+		handler.GetProposals).Methods("Get")
+	router.HandleFunc("/api/governance/proposal",
+		handler.GetProposal).Methods("Get")
+	router.HandleFunc("/api/governance/votes",
+		handler.GetVotes).Methods("Get")
 
 	log.Fatal(graceful.ListenAndServe(":"+apiPort, router))
 	return nil

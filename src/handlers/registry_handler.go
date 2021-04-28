@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"google.golang.org/grpc"
 
@@ -37,7 +38,7 @@ func GetEntities(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if !confirmation {
+	if confirmation == false {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -52,8 +53,8 @@ func GetEntities(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexpected value found, height needs to be " +
-				"a string representing an int!"})
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
 		return
 	}
 
@@ -99,7 +100,7 @@ func GetNodes(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if !confirmation {
+	if confirmation == false {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -114,8 +115,8 @@ func GetNodes(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexpected value found, height needs to be " +
-				"a string representing an int!"})
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
 		return
 	}
 
@@ -223,7 +224,7 @@ func GetRuntimes(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if !confirmation {
+	if confirmation == false {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -238,9 +239,14 @@ func GetRuntimes(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexpected value found, height needs to be " +
-				"a string representing an int!"})
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
 		return
+	}
+
+	suspendedBool, err := strconv.ParseBool(r.URL.Query().Get("suspended"))
+	if err != nil {
+		suspendedBool = false
 	}
 
 	// Attempt to load connection with registry client
@@ -259,9 +265,10 @@ func GetRuntimes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Retrieving runtimes at specific block height from registry client
+	query := registry.GetRuntimesQuery{Height: height,
+		IncludeSuspended: suspendedBool}
 
-	query := registry.GetRuntimesQuery{Height: height, IncludeSuspended: true}
+	// Retrieving runtimes at specific block height from registry client
 	runtimes, err := ro.GetRuntimes(context.Background(), &query)
 	if err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -289,7 +296,7 @@ func GetRegistryStateToGenesis(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if !confirmation {
+	if confirmation == false {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -304,8 +311,8 @@ func GetRegistryStateToGenesis(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexpected value found, height needs to be " +
-				"a string representing an int!"})
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
 		return
 	}
 
@@ -353,7 +360,7 @@ func GetEntity(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if !confirmation {
+	if confirmation == false {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -368,8 +375,8 @@ func GetEntity(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexpected value found, height needs to be " +
-				"a string representing an int!"})
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
 		return
 	}
 
@@ -442,7 +449,7 @@ func GetNode(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if !confirmation {
+	if confirmation == false {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -457,8 +464,8 @@ func GetNode(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexpected value found, height needs to be " +
-				"a string representing an int!"})
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
 		return
 	}
 
@@ -622,7 +629,7 @@ func GetRuntime(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if !confirmation {
+	if confirmation == false {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
@@ -637,8 +644,8 @@ func GetRuntime(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Unexpected value found, height needs to be " +
-				"a string representing an int!"})
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
 		return
 	}
 
