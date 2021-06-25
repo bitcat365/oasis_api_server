@@ -22,8 +22,8 @@ require (
 	github.com/gorilla/mux v1.7.4
 	github.com/mackerelio/go-osstat v0.1.0
 	github.com/oasisprotocol/oasis-core/go v0.2102.4
-	github.com/prometheus/common v0.19.0
-	github.com/tendermint/tendermint v0.34.9-oasis2
+	github.com/prometheus/common v0.25.0
+	github.com/tendermint/tendermint v0.34.9
 	github.com/zenazn/goji v0.9.0
-	google.golang.org/grpc v1.36.0
+	google.golang.org/grpc v1.38.0
 )
