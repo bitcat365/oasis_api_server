@@ -9,6 +9,8 @@ import (
 	common_quantity "github.com/oasisprotocol/oasis-core/go/common/quantity"
 	consensus_api "github.com/oasisprotocol/oasis-core/go/consensus/api"
 	governance "github.com/oasisprotocol/oasis-core/go/governance/api"
+	roothash "github.com/oasisprotocol/oasis-core/go/roothash/api"
+	"github.com/oasisprotocol/oasis-core/go/roothash/api/block"
 
 	//epoch_api "github.com/oasisprotocol/oasis-core/go/epochtime/api"
 	beacon_api "github.com/oasisprotocol/oasis-core/go/beacon/api"
@@ -240,6 +242,16 @@ type ProposalResponse struct {
 // VotesResponse with governance Document
 type VotesResponse struct {
 	Votes []*governance.VoteEntry `json:"result"`
+}
+
+// RuntimeStateResponse with roothash Document
+type RuntimeStateResponse struct {
+	RuntimeState *roothash.RuntimeState `json:"result"`
+}
+
+// RoothashLatestBlockResponse with roothash Document
+type RoothashLatestBlockResponse struct {
+	LatestBlock *block.Block `json:"result"`
 }
 
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.

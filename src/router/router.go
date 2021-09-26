@@ -154,6 +154,12 @@ func StartServer() error {
 	router.HandleFunc("/api/governance/votes",
 		handler.GetVotes).Methods("Get")
 
+	// Router Handlers to handle Roothash API Calls
+	router.HandleFunc("/api/roothash/runtimestate",
+		handler.GetRuntimeState).Methods("Get")
+	router.HandleFunc("/api/roothash/latestblock",
+		handler.GetLatestBlock).Methods("Get")
+
 	log.Fatal(graceful.ListenAndServe(":"+apiPort, router))
 	return nil
 }
