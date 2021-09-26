@@ -254,5 +254,10 @@ type RoothashLatestBlockResponse struct {
 	LatestBlock *block.Block `json:"result"`
 }
 
+// RoothashEventsResponse with roothash Document
+type RoothashEventsResponse struct {
+	RoothashEvents []*roothash.Event `json:"result"`
+}
+
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.
 var SuccessResponsed = SuccessResponse{Result: "pong"}

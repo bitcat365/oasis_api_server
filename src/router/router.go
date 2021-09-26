@@ -159,6 +159,8 @@ func StartServer() error {
 		handler.GetRuntimeState).Methods("Get")
 	router.HandleFunc("/api/roothash/latestblock",
 		handler.GetLatestBlock).Methods("Get")
+	router.HandleFunc("/api/roothash/events",
+		handler.GetRoothashEvents).Methods("Get")
 
 	log.Fatal(graceful.ListenAndServe(":"+apiPort, router))
 	return nil
