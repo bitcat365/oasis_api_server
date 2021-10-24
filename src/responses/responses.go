@@ -11,7 +11,7 @@ import (
 	governance "github.com/oasisprotocol/oasis-core/go/governance/api"
 	roothash "github.com/oasisprotocol/oasis-core/go/roothash/api"
 	"github.com/oasisprotocol/oasis-core/go/roothash/api/block"
-
+	runtime "github.com/oasisprotocol/oasis-core/go/runtime/client/api"
 	//epoch_api "github.com/oasisprotocol/oasis-core/go/epochtime/api"
 	beacon_api "github.com/oasisprotocol/oasis-core/go/beacon/api"
 	gen_api "github.com/oasisprotocol/oasis-core/go/genesis/api"
@@ -257,6 +257,26 @@ type RoothashLatestBlockResponse struct {
 // RoothashEventsResponse with roothash Document
 type RoothashEventsResponse struct {
 	RoothashEvents []*roothash.Event `json:"result"`
+}
+
+// RuntimeBlockResponse with runtime Document
+type RuntimeBlockResponse struct {
+	RuntimeBlock *block.Block `json:"result"`
+}
+
+// RuntimeTransactionsResponse with runtime Document
+type RuntimeTransactionsResponse struct {
+	RuntimeTransactions [][]byte `json:"result"`
+}
+
+// RuntimeEventsResponse with runtime Document
+type RuntimeEventsResponse struct {
+	RuntimeEvents []*runtime.Event `json:"result"`
+}
+
+// RuntimeQueryResponse with runtime Document
+type RuntimeQueryResponse struct {
+	RuntimeQuery *runtime.QueryResponse `json:"result"`
 }
 
 // SuccessResponsed Assinging Variable Responses that do not need to be changed.

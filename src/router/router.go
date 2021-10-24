@@ -162,6 +162,16 @@ func StartServer() error {
 	router.HandleFunc("/api/roothash/events",
 		handler.GetRoothashEvents).Methods("Get")
 
+	// Router Handlers to handle Runtime API Calls
+	router.HandleFunc("/api/runtime/block",
+		handler.GetRuntimeBlock).Methods("Get")
+	router.HandleFunc("/api/runtime/transactions",
+		handler.GetRuntimeTransactions).Methods("Get")
+	router.HandleFunc("/api/runtime/events",
+		handler.GetRuntimeEvents).Methods("Get")
+	router.HandleFunc("/api/runtime/query",
+		handler.RuntimeQuery).Methods("Get")
+
 	log.Fatal(graceful.ListenAndServe(":"+apiPort, router))
 	return nil
 }

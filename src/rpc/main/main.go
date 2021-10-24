@@ -24,7 +24,7 @@ func main() {
 	}
 	fmt.Println(NewAddress(pubKey))
 
-	b, err := base64.StdEncoding.DecodeString(string("AKFreVYqiVbzFffBiBri7pPb/Av4"))
+	b, err := base64.StdEncoding.EncodeToString(string("AKFreVYqiVbzFffBiBri7pPb/Av4"))
 	if err != nil {
 	}
 	fmt.Println(b)

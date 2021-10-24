@@ -17,6 +17,7 @@ import (
 	governance "github.com/oasisprotocol/oasis-core/go/governance/api"
 	registry "github.com/oasisprotocol/oasis-core/go/registry/api"
 	roothash "github.com/oasisprotocol/oasis-core/go/roothash/api"
+	runtime "github.com/oasisprotocol/oasis-core/go/runtime/client/api"
 	scheduler "github.com/oasisprotocol/oasis-core/go/scheduler/api"
 	sentry "github.com/oasisprotocol/oasis-core/go/sentry/api"
 	staking "github.com/oasisprotocol/oasis-core/go/staking/api"
@@ -104,6 +105,20 @@ func RoothashClient(address string) (*grpc.ClientConn,
 	}
 
 	client := roothash.NewRootHashClient(conn)
+	return conn, client, nil
+}
+
+// RuntimeClient - initiate new runtime client
+func RuntimeClient(address string) (*grpc.ClientConn,
+	runtime.RuntimeClient, error) {
+
+	conn, err := Connect(address)
+	if err != nil {
+		return nil, nil, fmt.Errorf("Failed to establish Runtime "+
+			"Client Connection with node %s", address)
+	}
+
+	client := runtime.NewRuntimeClient(conn)
 	return conn, client, nil
 }
 
