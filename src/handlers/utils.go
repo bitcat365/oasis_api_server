@@ -18,8 +18,8 @@ func checkSentryData(nodeName string) (bool, string, string) {
 	for _, sentry := range allSentries {
 		// If nodeName is in configuration reply with it's websocket
 		if sentry["node_name"] == nodeName {
-			lgr.Info.Printf("Requested sentry %s was found!",
-				nodeName)
+			//lgr.Info.Printf("Requested sentry %s was found!",
+			//	nodeName)
 			return true, sentry["ext_url"], sentry["tls_path"]
 		}
 	}
@@ -42,8 +42,8 @@ func checkNodeName(nodeName string) (bool, string) {
 
 		// If nodeName is in configuration reply with it's websocket
 		if socket["node_name"] == nodeName {
-			lgr.Info.Printf("Requested node %s was found!",
-				nodeName)
+			//lgr.Info.Printf("Requested node %s was found!",
+			//	nodeName)
 			return true, socket["isocket_path"]
 		}
 	}
@@ -68,8 +68,8 @@ func checkNodeNamePrometheus(nodeName string) (bool, string) {
 		// If nodeName is in configuration reply with it's prometheus
 		// url
 		if node["node_name"] == nodeName {
-			lgr.Info.Printf("Requested node %s was found!",
-				nodeName)
+			//lgr.Info.Printf("Requested node %s was found!",
+			//	nodeName)
 			return true, node["prometheus_url"]
 		}
 	}
@@ -94,7 +94,7 @@ func checkHeight(recvHeight string) int64 {
 	//  parameter was passed use latest height
 	if len(recvHeight) == 0 {
 		height = consensus.HeightLatest
-		lgr.Info.Println("No height specified getting latest height!")
+		//lgr.Info.Println("No height specified getting latest height!")
 	} else {
 
 		// If height isn't empty attempt to parse it into int64
@@ -186,7 +186,7 @@ func getNodeExporter() (bool, string) {
 	mainInfo := config.GetMain()
 
 	if mainInfo["api_server"]["metrics_url"] != "" {
-		lgr.Info.Println("Requested node Node Exporter was found!")
+		//lgr.Info.Println("Requested node Node Exporter was found!")
 		return true, mainInfo["api_server"]["metrics_url"]
 	}
 

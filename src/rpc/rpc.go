@@ -16,6 +16,8 @@ import (
 	control "github.com/oasisprotocol/oasis-core/go/control/api"
 	governance "github.com/oasisprotocol/oasis-core/go/governance/api"
 	registry "github.com/oasisprotocol/oasis-core/go/registry/api"
+	roothash "github.com/oasisprotocol/oasis-core/go/roothash/api"
+	runtime "github.com/oasisprotocol/oasis-core/go/runtime/client/api"
 	scheduler "github.com/oasisprotocol/oasis-core/go/scheduler/api"
 	sentry "github.com/oasisprotocol/oasis-core/go/sentry/api"
 	staking "github.com/oasisprotocol/oasis-core/go/staking/api"
@@ -89,6 +91,34 @@ func GovernanceClient(address string) (*grpc.ClientConn,
 	}
 
 	client := governance.NewGovernanceClient(conn)
+	return conn, client, nil
+}
+
+// RoothashClient - initiate new roothash client
+func RoothashClient(address string) (*grpc.ClientConn,
+	roothash.Backend, error) {
+
+	conn, err := Connect(address)
+	if err != nil {
+		return nil, nil, fmt.Errorf("Failed to establish Roothash "+
+			"Client Connection with node %s", address)
+	}
+
+	client := roothash.NewRootHashClient(conn)
+	return conn, client, nil
+}
+
+// RuntimeClient - initiate new runtime client
+func RuntimeClient(address string) (*grpc.ClientConn,
+	runtime.RuntimeClient, error) {
+
+	conn, err := Connect(address)
+	if err != nil {
+		return nil, nil, fmt.Errorf("Failed to establish Runtime "+
+			"Client Connection with node %s", address)
+	}
+
+	client := runtime.NewRuntimeClient(conn)
 	return conn, client, nil
 }
 
