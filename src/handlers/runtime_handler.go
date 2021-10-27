@@ -6,6 +6,7 @@ import (
 	lgr "github.com/SimplyVC/oasis_api_server/src/logger"
 	"github.com/SimplyVC/oasis_api_server/src/responses"
 	"github.com/SimplyVC/oasis_api_server/src/rpc"
+	"github.com/oasisprotocol/oasis-core/go/common"
 	common_namespace "github.com/oasisprotocol/oasis-core/go/common"
 	runtime "github.com/oasisprotocol/oasis-core/go/runtime/client/api"
 	"google.golang.org/grpc"
@@ -56,26 +57,11 @@ func GetRuntimeBlock(w http.ResponseWriter, r *http.Request) {
 	var round uint64
 	round, _ = (strconv.ParseUint(recvRound, 10, 64))
 
-	// Note Make sure that private key that is being sent is coded properly
-	// Example A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU+h+blS9pto= should be
-	// A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU%2Bh%2BblS9pto=
-	var nameSpace common_namespace.Namespace
-	nmspace := r.URL.Query().Get("namespace")
-	if len(nmspace) == 0 {
-		// Stop code here no need to establish connection and reply
-		lgr.Warning.Println("Request at /api/runtime/block failed" +
-			", namespace can't be empty!")
+	var id common.Namespace
+	_id := r.URL.Query().Get("id")
+	if err := id.UnmarshalHex(_id); err != nil {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "namespace can't be empty!"})
-		return
-	}
-
-	// Unmarshal received text into namespace object
-	err := nameSpace.UnmarshalText([]byte(nmspace))
-	if err != nil {
-		lgr.Error.Println("Failed to UnmarshalText into Namespace", err)
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "Failed to UnmarshalText into Namespace."})
+			Error: "failed to decode runtime id"})
 		return
 	}
 
@@ -95,7 +81,7 @@ func GetRuntimeBlock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := runtime.GetBlockRequest{RuntimeID: nameSpace, Round: round}
+	query := runtime.GetBlockRequest{RuntimeID: id, Round: round}
 
 	// Retrieving events object using above query
 	runtimeBlock, err := ro.GetBlock(context.Background(), &query)
