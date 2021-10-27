@@ -60,8 +60,7 @@ func GetRuntimeBlock(w http.ResponseWriter, r *http.Request) {
 	var id common.Namespace
 	_id := r.URL.Query().Get("id")
 	if err := id.UnmarshalHex(_id); err != nil {
-		json.NewEncoder(w).Encode(responses.ErrorResponse{
-			Error: "failed to decode runtime id"})
+		lgr.Error.Println("failed to decode runtime id", err)
 		return
 	}
 
