@@ -269,6 +269,11 @@ type RuntimeTransactionsResponse struct {
 	RuntimeTransactions [][]byte `json:"result"`
 }
 
+// RuntimeTransactionsWithResultsResponse with runtime Document
+type RuntimeTransactionsWithResultsResponse struct {
+	RuntimeTransactionsWithResults []*runtime.TransactionWithResults `json:"result"`
+}
+
 // RuntimeEventsResponse with runtime Document
 type RuntimeEventsResponse struct {
 	RuntimeEvents []*runtime.Event `json:"result"`

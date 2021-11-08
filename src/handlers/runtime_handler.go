@@ -172,6 +172,79 @@ func GetRuntimeTransactions(w http.ResponseWriter, r *http.Request) {
 		RuntimeTransactions: runtimeTransactions})
 }
 
+// GetRuntimeTransactionsWithResults returns the events at specified block height.
+func GetRuntimeTransactionsWithResults(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving name of node from query request
+	nodeName := r.URL.Query().Get("name")
+	confirmation, socket := checkNodeName(nodeName)
+	if confirmation == false {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Node name requested doesn't exist"})
+		return
+	}
+
+	// Retrieving height from query request
+	recvRound := r.URL.Query().Get("round")
+	if len(recvRound) == 0 {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Unexepcted value found, height needs to be " +
+				"string of int!"})
+		return
+	}
+	var round uint64
+	round, _ = (strconv.ParseUint(recvRound, 10, 64))
+
+	var id common_namespace.Namespace
+	_id := r.URL.Query().Get("id")
+	if err := id.UnmarshalHex(_id); err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "failed to decode runtime id"})
+		return
+	}
+
+	// Attempt to load connection with runtime client
+	connection, ro := loadRuntimeClient(socket)
+
+	// Close connection once code underneath executes
+	defer connection.Close()
+
+	// If null object was retrieved send response
+	if ro == nil {
+
+		// Stop code here faild to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to establish connection using socket: " +
+				socket})
+		return
+	}
+
+	query := runtime.GetTransactionsRequest{RuntimeID: id, Round: round}
+
+	// Retrieving events object using above query
+	runtimeTransactionsWithResults, err := ro.GetTransactionsWithResults(context.Background(), &query)
+	if err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to get Runtime Transactions!"})
+		lgr.Error.Println("Request at /api/runtime/transactionswithresults failed "+
+			"to retrieve Runtime Transactions : ", err)
+		return
+	}
+
+	// Responding with events object retrieved above
+	lgr.Info.Println("Request at /api/runtime/transactionswithresults responding with " +
+		"Runtime Transactions!")
+	json.NewEncoder(w).Encode(responses.RuntimeTransactionsWithResultsResponse{
+		RuntimeTransactionsWithResults: runtimeTransactionsWithResults})
+}
+
 // GetRuntimeEvents returns the events at specified block height.
 func GetRuntimeEvents(w http.ResponseWriter, r *http.Request) {
 

@@ -167,6 +167,8 @@ func StartServer() error {
 		handler.GetRuntimeBlock).Methods("Get")
 	router.HandleFunc("/api/runtime/transactions",
 		handler.GetRuntimeTransactions).Methods("Get")
+	router.HandleFunc("/api/runtime/transactionswithresults",
+		handler.GetRuntimeTransactionsWithResults).Methods("Get")
 	router.HandleFunc("/api/runtime/events",
 		handler.GetRuntimeEvents).Methods("Get")
 	router.HandleFunc("/api/runtime/query",
