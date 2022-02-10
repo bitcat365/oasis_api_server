@@ -524,7 +524,7 @@ func GetDelegationsFor(w http.ResponseWriter, r *http.Request) {
 			Error: "Failed to get Delegations!"})
 
 		lgr.Error.Println(
-			"Request at /api/staking/delegationsfor failed to retrieve "+
+			"Request at /api/staking/delegations failed to retrieve "+
 				"Delegations : ", err)
 		return
 	}
@@ -532,13 +532,11 @@ func GetDelegationsFor(w http.ResponseWriter, r *http.Request) {
 	// Respond with delegations for given account query
 	lgr.Info.Println("Request at /api/staking/delegations responding with " +
 		"delegations!")
-	json.NewEncoder(w).Encode(responses.DelegationsResponse{Delegations:
-	delegationsFor})
+	json.NewEncoder(w).Encode(responses.DelegationsResponse{Delegations: delegationsFor})
 }
 
-// GetDebondingDelegationsFor returns list of debonding delegations
-// for given owner (delegator).
-func GetDebondingDelegationsFor(w http.ResponseWriter, r *http.Request) {
+// GetDelegationsTo returns the list of (incoming) delegations to the given account
+func GetDelegationsTo(w http.ResponseWriter, r *http.Request) {
 
 	// Add header so that received knows they're receiving JSON
 	w.Header().Add("Content-Type", "application/json")
@@ -546,7 +544,8 @@ func GetDebondingDelegationsFor(w http.ResponseWriter, r *http.Request) {
 	// Retrieving name of node from query request
 	nodeName := r.URL.Query().Get("name")
 	confirmation, socket := checkNodeName(nodeName)
-	if !confirmation  {
+	if confirmation == false {
+
 		// Stop code here no need to establish connection and reply
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Node name requested doesn't exist"})
@@ -573,7 +572,105 @@ func GetDebondingDelegationsFor(w http.ResponseWriter, r *http.Request) {
 
 		// Stop code here no need to establish connection and reply
 		lgr.Warning.Println(
-			"Request at /api/staking/account failed, address can't be " +
+			"Request at /api/staking/delegationsto failed, address can't be " +
+				"empty!")
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "address can't be empty!"})
+		return
+	}
+
+	// Unmarshal text into public key object
+	//err := pubKey.UnmarshalText([]byte(ownerKey))
+	//if err != nil {
+	//	lgr.Error.Println("Failed to UnmarshalText into Public Key", err)
+	//	json.NewEncoder(w).Encode(responses.ErrorResponse{
+	//		Error: "Failed to UnmarshalText into Public Key."})
+	//	return
+	//}
+
+	var address staking.Address
+	err := address.UnmarshalText([]byte(ownerKey))
+	if err != nil {
+		lgr.Error.Println("Failed to UnmarshalText into Address", err)
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to UnmarshalText into Address."})
+		return
+	}
+
+	// Attempt to load connection with staking client
+	connection, so := loadStakingClient(socket)
+
+	// Close connection once code underneath executes
+	defer connection.Close()
+
+	// If null object was retrieved send response
+	if so == nil {
+
+		// Stop code here faild to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to establish connection using socket : " + socket})
+		return
+	}
+
+	// Create an owner query to be able to retrieve data with regards to account
+	query := staking.OwnerQuery{Height: height, Owner: address}
+
+	// Return the list of (incoming) delegations to the given account
+	delegationsTo, err := so.DelegationsTo(context.Background(), &query)
+	if err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to get Delegations!"})
+
+		lgr.Error.Println(
+			"Request at /api/staking/delegationsto failed to retrieve "+
+				"Delegations : ", err)
+		return
+	}
+
+	// Respond with delegations for given account query
+	lgr.Info.Println("Request at /api/staking/delegationsto responding with " +
+		"delegations!")
+	json.NewEncoder(w).Encode(responses.DelegationsResponse{Delegations: delegationsTo})
+}
+
+// GetDebondingDelegationsFor returns list of debonding delegations
+// for given owner (delegator).
+func GetDebondingDelegationsFor(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving name of node from query request
+	nodeName := r.URL.Query().Get("name")
+	confirmation, socket := checkNodeName(nodeName)
+	if !confirmation {
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Node name requested doesn't exist"})
+		return
+	}
+
+	// Retrieving height from query request
+	recvHeight := r.URL.Query().Get("height")
+	height := checkHeight(recvHeight)
+	if height == -1 {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Unexpected value found, height needs to be a string representing an int!"})
+		return
+	}
+
+	// Note Make sure that public key that is being sent is coded properly
+	// Example A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU+h+blS9pto= should be
+	// A1X90rT/WK4AOTh/dJsUlOqNDV/nXM6ZU%2Bh%2BblS9pto=
+	//var pubKey common_signature.PublicKey
+	ownerKey := r.URL.Query().Get("ownerKey")
+	if len(ownerKey) == 0 {
+
+		// Stop code here no need to establish connection and reply
+		lgr.Warning.Println(
+			"Request at /api/staking/debondingdelegations failed, address can't be " +
 				"empty!")
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "address can't be empty!"})
@@ -623,14 +720,14 @@ func GetDebondingDelegationsFor(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(responses.ErrorResponse{
 			Error: "Failed to get Debonding Delegations!"})
 		lgr.Error.Println(
-			"Request at /api/staking/debondingdelegationsfor failed to retrieve"+
+			"Request at /api/staking/debondingdelegations failed to retrieve"+
 				" Debonding Delegations : ", err)
 		return
 	}
 
 	// Responding with debonding delegations for given accounts
 	lgr.Info.Println(
-		"Request at /api/staking/debondingdelegationsfor responding with " +
+		"Request at /api/staking/debondingdelegations responding with " +
 			"Debonding Delegations!")
 	json.NewEncoder(w).Encode(responses.DebondingDelegationsResponse{
 		DebondingDelegations: debondingDelegationsFor})
