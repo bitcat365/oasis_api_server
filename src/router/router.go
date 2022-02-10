@@ -111,6 +111,8 @@ func StartServer() error {
 		handler.GetAccountInfo).Methods("Get")
 	router.HandleFunc("/api/staking/delegations",
 		handler.GetDelegationsFor).Methods("Get")
+	router.HandleFunc("/api/staking/delegationsto",
+		handler.GetDelegationsTo).Methods("Get")
 	router.HandleFunc("/api/staking/debondingdelegations",
 		handler.GetDebondingDelegationsFor).Methods("Get")
 	router.HandleFunc("/api/staking/events",
