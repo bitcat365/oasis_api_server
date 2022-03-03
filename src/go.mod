@@ -12,7 +12,7 @@ replace (
 	// spf13/cobra exists and tendermint is updated to include it.
 	// https://github.com/spf13/cobra/issues/1091
 	github.com/gorilla/websocket => github.com/gorilla/websocket v1.4.2
-	github.com/tendermint/tendermint => github.com/oasisprotocol/tendermint v0.34.9-oasis2
+	github.com/tendermint/tendermint => github.com/oasisprotocol/tendermint v0.34.15-oasis1
 	golang.org/x/crypto/curve25519 => github.com/oasisprotocol/ed25519/extra/x25519 v0.0.0-20210127160119-f7017427c1ea
 	golang.org/x/crypto/ed25519 => github.com/oasisprotocol/ed25519 v0.0.0-20210127160119-f7017427c1ea
 )
@@ -25,5 +25,5 @@ require (
 	github.com/prometheus/common v0.31.0
 	github.com/tendermint/tendermint v0.34.9
 	github.com/zenazn/goji v0.9.0
-	google.golang.org/grpc v1.41.0
+	google.golang.org/grpc v1.42.0
 )
