@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"strconv"
+
 	//"github.com/oasisprotocol/oasis-core/go/common/crypto/address"
 	staking "github.com/oasisprotocol/oasis-core/go/staking/api"
 	"net/http"
@@ -13,11 +15,11 @@ import (
 	lgr "github.com/SimplyVC/oasis_api_server/src/logger"
 	"github.com/SimplyVC/oasis_api_server/src/responses"
 	"github.com/SimplyVC/oasis_api_server/src/rpc"
+	beacon "github.com/oasisprotocol/oasis-core/go/beacon/api"
 	"github.com/oasisprotocol/oasis-core/go/common/cbor"
 	"github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
 	common_signature "github.com/oasisprotocol/oasis-core/go/common/crypto/signature"
 	consensus "github.com/oasisprotocol/oasis-core/go/consensus/api"
-	beacon "github.com/oasisprotocol/oasis-core/go/beacon/api"
 	mint_api "github.com/oasisprotocol/oasis-core/go/consensus/tendermint/api"
 	"github.com/oasisprotocol/oasis-core/go/consensus/tendermint/crypto"
 )
@@ -173,6 +175,80 @@ func GetEpoch(w http.ResponseWriter, r *http.Request) {
 	lgr.Info.Println("Request at /api/consensus/epoch responding" +
 		" with an Epoch!")
 	json.NewEncoder(w).Encode(responses.EpochResponse{Ep: epoch})
+}
+
+// GetEpochBlock returns the block height at the start of the said epoch.
+func GetEpochBlock(w http.ResponseWriter, r *http.Request) {
+
+	// Add header so that received knows they're receiving JSON
+	w.Header().Add("Content-Type", "application/json")
+
+	// Retrieving name of node from query request
+	nodeName := r.URL.Query().Get("name")
+	confirmation, socket := checkNodeName(nodeName)
+	if confirmation == false {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Node name requested doesn't exist"})
+		return
+	}
+
+	// Retrieve height from query
+	recvEpoch := r.URL.Query().Get("epoch")
+	if len(recvEpoch) == 0 {
+
+		// Stop code here no need to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Unexpected value found, epoch needs to be " +
+				"a string representing an int!"})
+		return
+	}
+
+	var epoch int64
+	_, err := (strconv.ParseInt(recvEpoch, 10, 64))
+	if err != nil {
+
+		// If it fails it means that string given
+		// wasn't number and return result for
+		lgr.Error.Println("Unexpected value found, required "+
+			"string of int but received ", recvEpoch)
+		return
+	}
+
+	// If succeeded then parse it again and set height.
+	epoch, _ = (strconv.ParseInt(recvEpoch, 10, 64))
+
+	// Attempt to load connection with beacon client
+	connection, be := loadBeaconClient(socket)
+
+	// Close connection once code underneath executes
+	defer connection.Close()
+
+	// If null object was retrieved send response
+	if be == nil {
+		// Stop code here faild to establish connection and reply
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to establish connection using socket: " +
+				socket})
+		return
+	}
+
+	// Return the block height at the start of the said epoch.
+	height, err := be.GetEpochBlock(context.Background(), beacon.EpochTime(epoch))
+	if err != nil {
+		json.NewEncoder(w).Encode(responses.ErrorResponse{
+			Error: "Failed to retrieve Block of Epoch!"})
+
+		lgr.Error.Println("Request at /api/consensus/epochblock failed to"+
+			" retrieve Epoch : ", err)
+		return
+	}
+
+	// Respond with retrieved height above
+	lgr.Info.Println("Request at /api/consensus/epochblock responding" +
+		" with an Epoch!")
+	json.NewEncoder(w).Encode(responses.EpochBlockResponse{Height: height})
 }
 
 // PingNode returns consensus block at specific height
