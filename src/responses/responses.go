@@ -199,9 +199,14 @@ type SignedHeader struct {
 	SH *mint_types.SignedHeader `json:"result"`
 }
 
-// EpochResponse responds with epcoh time
+// EpochResponse responds with epoch time
 type EpochResponse struct {
 	Ep beacon_api.EpochTime `json:"result"`
+}
+
+// EpochBlockResponse responds with block height
+type EpochBlockResponse struct {
+	Height int64 `json:"result"`
 }
 
 // ConsensusGenesisResponse with consensus Genesis Document

@@ -53,6 +53,8 @@ func StartServer() error {
 		handler.GetConsensusStateToGenesis).Methods("Get")
 	router.HandleFunc("/api/consensus/epoch",
 		handler.GetEpoch).Methods("Get")
+	router.HandleFunc("/api/consensus/epochblock",
+		handler.GetEpochBlock).Methods("Get")
 	router.HandleFunc("/api/consensus/block",
 		handler.GetBlock).Methods("Get")
 	router.HandleFunc("/api/consensus/status",
