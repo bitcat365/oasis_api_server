@@ -24,13 +24,11 @@ func main() {
 	}
 	fmt.Println(NewAddress(pubKey))
 
-	b, err := base64.StdEncoding.EncodeToString(string("AKFreVYqiVbzFffBiBri7pPb/Av4"))
-	if err != nil {
-	}
+	b := base64.StdEncoding.EncodeToString([]byte(("AKFreVYqiVbzFffBiBri7pPb/Av4")))
 	fmt.Println(b)
 
 	var addr address.Address
-	addr.UnmarshalBinary(b)
+	//addr.UnmarshalBinary(b)
 	fmt.Println(addr)
 
 	//tmAddr := tmcrypto.PublicKeyToTendermint(&pubKey).Address().String()
