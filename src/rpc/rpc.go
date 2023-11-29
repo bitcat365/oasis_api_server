@@ -148,18 +148,18 @@ func BeaconClient(address string) (*grpc.ClientConn,
 	return conn, client, nil
 }
 
-// ConsensusLightClient - initiate new consensus light client
-func ConsensusLightClient(address string) (*grpc.ClientConn,
-	consensus.LightClientBackend, error) {
-	conn, err := Connect(address)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to establish connection "+
-			"with node %s", address)
-	}
-
-	client := consensus.NewConsensusLightClient(conn)
-	return conn, client, nil
-}
+//// ConsensusLightClient - initiate new consensus light client
+//func ConsensusLightClient(address string) (*grpc.ClientConn,
+//	consensus.LightClientBackend, error) {
+//	conn, err := Connect(address)
+//	if err != nil {
+//		return nil, nil, fmt.Errorf("failed to establish connection "+
+//			"with node %s", address)
+//	}
+//
+//	client := consensus.NewConsensusLightClient(conn)
+//	return conn, client, nil
+//}
 
 // StakingClient - initiate new staking client
 func StakingClient(address string) (*grpc.ClientConn, staking.Backend, error) {
